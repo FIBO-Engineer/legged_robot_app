@@ -3,17 +3,17 @@ import 'package:flutter/material.dart';
 class AppThemes {
   static final ThemeData darkTheme = ThemeData(
     brightness: Brightness.dark,
-    primaryColor: Colors.blue[600],
-    scaffoldBackgroundColor: Color(0xFF191A1B),
+    primaryColor: Color(0xFF02ABFF),
+    scaffoldBackgroundColor: Color(0xFF101010),
     appBarTheme: AppBarTheme(
-      backgroundColor: Colors.black,
+      backgroundColor: Color(0xFF09090B),
       elevation: 0,
       iconTheme: IconThemeData(color: Colors.white),
       titleTextStyle: TextStyle(color: Colors.white, fontSize: 20),
     ),
     colorScheme: ColorScheme.dark(
-      primary: Colors.blue,
-      secondary: Colors.blueAccent,
+      primary: Color(0xFF02ABFF),
+      secondary: Color(0xFF02ABFF),
     ),
   );
 

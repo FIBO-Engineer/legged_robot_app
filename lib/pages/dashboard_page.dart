@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:legged_robot_app/units/app_colors.dart';
+import '../units/app_constants.dart';
 import '../widgets/app_navigation_bar.dart';
+import '../widgets/camera/camera_view.dart';
 import '../widgets/custom_widget.dart';
 
 class DashboardPage extends StatelessWidget {
@@ -8,24 +10,29 @@ class DashboardPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final double width = size.width;
-    final bool isTablet = width >= 900 && width < 1024;
-    final bool isDesktop = width >= 1024;
+    final screen = ScreenSize(context);
 
-    if (isDesktop || isTablet) {
-      // Desktop/Tablet: Sidebar left, Content right
+    if (screen.isDesktop || screen.isTablet) {
       return Scaffold(
         backgroundColor: AppColors.background,
         body: Row(
           children: [
-            buildResponsiveNavBar(context), // sidebar (เมนู)
-            Expanded(child: DashboardScreen()), // content
+            buildResponsiveNavBar(context),
+            Expanded(child: DashboardScreen()),
+          ],
+        ),
+      );
+    } else if (screen.isPortrait) {
+      return Scaffold(
+        backgroundColor: AppColors.background,
+        body: Column(
+          children: [
+            Expanded(child: DashboardScreen()),
+            buildResponsiveNavBar(context),
           ],
         ),
       );
     } else {
-      // Mobile: Stack (content + floating/bottom nav)
       return Scaffold(
         backgroundColor: AppColors.background,
         body: Stack(
@@ -42,34 +49,35 @@ class DashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final double width = size.width;
-    final bool isTablet = width >= 900 && width < 1024;
-    final bool isDesktop = width >= 1024;
-    final bool isPortrait = size.height > size.width;
+    final screen = ScreenSize(context);
 
-    if (isDesktop || isTablet) {
-      // Desktop/Tablet (Sidebar + Content)
+    if (screen.isDesktop || screen.isTablet) {
       return Stack(
         children: [
           Positioned.fill(child: _mapWidget()),
           Positioned(
-            top: 26,
-            right: 26,
-            child: _VideoWidget(
-              width: width * 0.3,
-              height: width * 0.3 * 9 / 16,
+            top: 20,
+            right: 20,
+            child: CameraView(
+              width: screen.width * 0.3,
+              height: screen.width * 0.3 * 9 / 16,
+              borderRadius: 12,
             ),
           ),
-          Positioned(top: 26, left: 26, child: _statusWidget(context)),
-          Positioned(bottom: 26, right: 26, child: _controlWidget()),
+          Positioned(top: 20, left: 20, child: _statusWidget(context)),
+          Positioned(bottom: 20, right: 20, child: _controlWidget()),
         ],
       );
-    } else if (isPortrait) {
-      // Mobile Portrait: Video บน, Map + status/fab ซ้อนด้านล่าง
+    } else if (screen.isPortrait) {
       return Column(
         children: [
-          AspectRatio(aspectRatio: 16 / 9, child: _VideoWidget()),
+          Padding(
+            padding: const EdgeInsets.only(top: 16, right: 16, left: 16),
+            child: AspectRatio(
+              aspectRatio: 16 / 9,
+              child: CameraView(borderRadius: 12),
+            ),
+          ),
           Expanded(
             child: Stack(
               children: [
@@ -82,20 +90,20 @@ class DashboardScreen extends StatelessWidget {
         ],
       );
     } else {
-      // Mobile Landscape: Map เต็ม, Video ขวาบน, Status ซ้ายบน, FAB ขวาล่าง
       return Stack(
         children: [
           Positioned.fill(child: _mapWidget()),
           Positioned(
-            top: 24,
-            right: 24,
-            child: _VideoWidget(
-              width: width * 0.35,
-              height: width * 0.35 * 9 / 16,
+            top: 20,
+            right: 20,
+            child: CameraView(
+              width: screen.width * 0.35,
+              height: screen.width * 0.35 * 9 / 16,
+              borderRadius: 12,
             ),
           ),
-          Positioned(top: 24, left: 24, child: _statusWidget(context)),
-          Positioned(bottom: 24, right: 24, child: _controlWidget()),
+          Positioned(top: 20, left: 20, child: _statusWidget(context)),
+          Positioned(bottom: 20, right: 20, child: _controlWidget()),
         ],
       );
     }
@@ -103,14 +111,17 @@ class DashboardScreen extends StatelessWidget {
 
   Widget _mapWidget() {
     return Container(
-      padding: EdgeInsets.all(12),
-      margin: EdgeInsets.all(12),
+      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppColors.scaffold,
         borderRadius: BorderRadius.circular(12),
       ),
       alignment: Alignment.center,
-      child: Text('MAP', style: TextStyle(color: Colors.white, fontSize: 28)),
+      child: const Text(
+        'MAP',
+        style: TextStyle(color: Colors.white, fontSize: 28),
+      ),
     );
   }
 
@@ -123,7 +134,7 @@ class DashboardScreen extends StatelessWidget {
           iconColor: Colors.white,
           onPressed: () {},
         ),
-        SizedBox(width: 16),
+        const SizedBox(width: 16),
         CircleButton(
           icon: Icons.error,
           backgroundColor: AppColors.card,
@@ -135,41 +146,38 @@ class DashboardScreen extends StatelessWidget {
   }
 
   Widget _statusWidget(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    final double boxWidth = width.clamp(100, 180);
+    final screen = ScreenSize(context);
+    double boxWidth =
+        screen.isDesktop
+            ? 180
+            : screen.isPortrait
+            ? 120
+            : 110;
+    final double fontSize = (boxWidth / 10).clamp(9, 14);
 
-    return Container(
-      width: boxWidth,
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: AppColors.grey.withValues(alpha: 0.8 * 255),
-          width: 1.2,
-        ),
-      ),
+    return IntrinsicWidth(
       child: Column(
-        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _statusRow(
             icon: Icons.flag,
             value: '10.00, 2.48',
             unit: 'm',
-            fontSize: boxWidth / 11,
+            fontSize: fontSize,
           ),
-          SizedBox(height: 6),
+          const SizedBox(height: 6),
           _statusRow(
-            icon: Icons.change_history,
+            icon: Icons.navigation_rounded,
             value: '90.05',
             unit: 'deg',
-            fontSize: boxWidth / 11,
+            fontSize: fontSize,
           ),
-          SizedBox(height: 6),
+          const SizedBox(height: 6),
           _statusRow(
             icon: Icons.speed,
             value: '1.05',
             unit: 'm/s',
-            fontSize: boxWidth / 11,
+            fontSize: fontSize,
           ),
         ],
       ),
@@ -183,61 +191,39 @@ class DashboardScreen extends StatelessWidget {
     double fontSize = 14,
   }) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
       decoration: BoxDecoration(
-        color: Color(0xFF232329),
-        borderRadius: BorderRadius.circular(12),
+        color: const Color(0xFF232329),
+        borderRadius: BorderRadius.circular(6),
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+
         children: [
-          Icon(icon, color: AppColors.grey, size: fontSize * 0.95),
-          SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              value,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: fontSize.clamp(12, 16),
-                letterSpacing: 1,
-              ),
+          Icon(icon, color: AppColors.grey, size: fontSize * 1.2),
+          const SizedBox(width: 8),
+          Text(
+            value,
+            textAlign: TextAlign.left,
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: fontSize.clamp(8, 14),
+              letterSpacing: fontSize < 10 ? 0.2 : 1,
+              fontFamily: 'monospace',
             ),
           ),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           Text(
             unit,
+            textAlign: TextAlign.left,
             style: TextStyle(
               color: AppColors.grey,
-              fontWeight: FontWeight.w400,
-              fontSize: fontSize.clamp(10, 12),
+              fontWeight: FontWeight.w500,
+              fontSize: fontSize.clamp(8, 12),
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _VideoWidget extends StatelessWidget {
-  final double? width;
-  final double? height;
-  const _VideoWidget({this.width, this.height});
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: width ?? double.infinity,
-      height: height,
-      decoration: BoxDecoration(
-        color: Colors.black,
-        borderRadius: BorderRadius.circular(18),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(18),
-        child: Center(
-          child: Text("VIDEO", style: TextStyle(color: Colors.white)),
-        ),
       ),
     );
   }

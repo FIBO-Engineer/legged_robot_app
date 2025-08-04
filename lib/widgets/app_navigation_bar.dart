@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../units/app_colors.dart';
+import '../units/app_constants.dart';
 
 /// Navigation Bar Responsive (Sidebar, Bottom, Floating)
 class AppNavigationBar extends StatelessWidget {
@@ -14,16 +15,11 @@ class AppNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final double width = size.width;
+    final screen = ScreenSize(context);
 
-    final bool isTablet = width >= 900 && width < 1024;
-    final bool isDesktop = width >= 1024;
-    final bool isPortrait = size.height > size.width;
-
-    if (isDesktop || isTablet) {
+    if (screen.isDesktop || screen.isTablet) {
       return _SidebarNavigation(selectedIndex: selectedIndex, onTap: onTap);
-    } else if (isPortrait) {
+    } else if (screen.isPortrait) {
       return _BottomNavigation(selectedIndex: selectedIndex, onTap: onTap);
     } else {
       return _FloatingNavigation(selectedIndex: selectedIndex, onTap: onTap);
@@ -89,7 +85,7 @@ class _BottomNavigation extends StatelessWidget {
   Widget build(BuildContext context) {
     return BottomNavigationBar(
       type: BottomNavigationBarType.fixed,
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.scaffold,
       selectedItemColor: AppColors.primary,
       unselectedItemColor: AppColors.grey,
       showSelectedLabels: false,
@@ -122,7 +118,7 @@ class _FloatingNavigation extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 2),
         decoration: BoxDecoration(
-          color: AppColors.card,
+          color: AppColors.scaffold,
           borderRadius: BorderRadius.circular(28),
         ),
         child: Row(
@@ -130,28 +126,28 @@ class _FloatingNavigation extends StatelessWidget {
           children: [
             _NavIcon(
               icon: Icons.dashboard,
-              size: 22,
+              size: 20,
               selected: selectedIndex == 0,
               onTap: () => onTap(0),
             ),
             const SizedBox(width: 28),
             _NavIcon(
               icon: Icons.gamepad,
-              size: 22,
+              size: 20,
               selected: selectedIndex == 1,
               onTap: () => onTap(1),
             ),
             const SizedBox(width: 28),
             _NavIcon(
               icon: Icons.flag,
-              size: 22,
+              size: 20,
               selected: selectedIndex == 2,
               onTap: () => onTap(2),
             ),
             const SizedBox(width: 28),
             _NavIcon(
               icon: Icons.settings,
-              size: 22,
+              size: 20,
               selected: selectedIndex == 3,
               onTap: () => onTap(3),
             ),
@@ -191,12 +187,7 @@ class _NavIcon extends StatelessWidget {
 ///-------------------------- Responsive Wrapper -------------------------- ///
 Widget buildResponsiveNavBar(BuildContext context) {
   final navIndex = getNavIndexByRoute(Get.currentRoute);
-
-  final size = MediaQuery.of(context).size;
-  final double width = size.width;
-  final bool isTablet = width >= 900 && width < 1024;
-  final bool isDesktop = width >= 1024;
-  final bool isPortrait = size.height > size.width;
+  final screen = ScreenSize(context);
 
   final navBar = AppNavigationBar(
     selectedIndex: navIndex,
@@ -218,15 +209,15 @@ Widget buildResponsiveNavBar(BuildContext context) {
     },
   );
 
-  if (isDesktop || isTablet) {
-    return navBar; 
-  } else if (isPortrait) {
+  if (screen.isDesktop || screen.isTablet) {
+    return navBar;
+  } else if (screen.isPortrait) {
     return Align(alignment: Alignment.bottomCenter, child: navBar);
   } else {
     return Positioned(
       left: 0,
       right: 0,
-      bottom: 24,
+      bottom: 20,
       child: Center(child: navBar),
     );
   }

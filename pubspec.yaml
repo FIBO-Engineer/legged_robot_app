@@ -37,6 +37,12 @@ dependencies:
   get: ^4.7.2
   web_socket_channel: ^3.0.3
   http: ^1.4.0
+  flutter_joystick: ^0.2.2
+  talker_flutter: ^4.9.3
+  get_storage: ^2.1.1
+  toastification: ^3.0.3
+  video_player: ^2.10.0
+  flutter_webrtc: ^1.0.0
 
 dev_dependencies:
   flutter_test:

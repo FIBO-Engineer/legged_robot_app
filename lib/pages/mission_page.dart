@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../units/app_constants.dart';
 import '../widgets/app_navigation_bar.dart';
 
 class MissionPage extends StatelessWidget {
@@ -6,18 +7,14 @@ class MissionPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final double width = size.width;
-    final bool isTablet = width >= 900 && width < 1024;
-    final bool isDesktop = width >= 1024;
+    final screen = ScreenSize(context);
 
-    if (isDesktop || isTablet) {
-      // Desktop/Tablet: Sidebar + Content
+    if (screen.isDesktop || screen.isTablet) {
       return Scaffold(
         backgroundColor: Colors.black,
         body: Row(
           children: [
-            buildResponsiveNavBar(context), // Sidebar
+            buildResponsiveNavBar(context),
             Expanded(
               child: Center(
                 child: Text(
@@ -30,7 +27,6 @@ class MissionPage extends StatelessWidget {
         ),
       );
     } else {
-      // Mobile: Stack (Content + Bottom/Floating Nav)
       return Scaffold(
         backgroundColor: Colors.black,
         body: Stack(
