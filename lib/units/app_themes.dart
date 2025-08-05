@@ -1,35 +1,57 @@
 import 'package:flutter/material.dart';
+import 'app_colors.dart';
 
-class AppThemes {
-  static final ThemeData darkTheme = ThemeData(
-    brightness: Brightness.dark,
-    primaryColor: Color(0xFF02ABFF),
-    scaffoldBackgroundColor: Color(0xFF101010),
-    appBarTheme: AppBarTheme(
-      backgroundColor: Color(0xFF09090B),
-      elevation: 0,
-      iconTheme: IconThemeData(color: Colors.white),
-      titleTextStyle: TextStyle(color: Colors.white, fontSize: 20),
-    ),
-    colorScheme: ColorScheme.dark(
-      primary: Color(0xFF02ABFF),
-      secondary: Color(0xFF02ABFF),
-    ),
-  );
+InputDecorationTheme inputDecorationTheme() {
+  const borderRadius = BorderRadius.all(Radius.circular(12));
 
-  static final ThemeData lightTheme = ThemeData(
-    brightness: Brightness.light,
-    primaryColor: Colors.blue[700],
-    scaffoldBackgroundColor: Color(0xFFF8F8F8),
-    appBarTheme: AppBarTheme(
-      backgroundColor: Colors.white,
-      elevation: 0,
-      iconTheme: IconThemeData(color: Colors.blue),
-      titleTextStyle: TextStyle(color: Colors.blue[900], fontSize: 20),
+  return InputDecorationTheme(
+    border: const OutlineInputBorder(
+      borderRadius: borderRadius,
+      borderSide: BorderSide.none,
     ),
-    colorScheme: ColorScheme.light(
-      primary: Colors.blue,
-      secondary: Colors.blueAccent,
+    enabledBorder: const OutlineInputBorder(
+      borderRadius: borderRadius,
+      borderSide: BorderSide.none,
     ),
+    focusedBorder: const OutlineInputBorder(
+      borderRadius: borderRadius,
+      borderSide: BorderSide(color: AppColors.primary, width: 1),
+    ),
+    errorBorder: const OutlineInputBorder(
+      borderRadius: borderRadius,
+      borderSide: BorderSide(color: AppColors.red, width: 1),
+    ),
+    focusedErrorBorder: const OutlineInputBorder(
+      borderRadius: borderRadius,
+      borderSide: BorderSide(color: AppColors.red, width: 1),
+    ),
+    filled: true,
+    alignLabelWithHint: true,
+    fillColor: AppColors.card,
+    prefixIconColor: AppColors.grey,
+    suffixIconColor: AppColors.grey,
+    helperStyle: const TextStyle(color: AppColors.grey, fontSize: 12),
+    errorStyle: const TextStyle(color: AppColors.red, fontSize: 12),
+    labelStyle: const TextStyle(
+      color: AppColors.grey,
+      fontSize: 12,
+      fontWeight: FontWeight.normal,
+    ),
+    hintStyle: const TextStyle(
+      color: AppColors.grey,
+      fontSize: 12,
+      fontWeight: FontWeight.normal,
+    ),
+    prefixStyle: const TextStyle(
+      color: Colors.black,
+      fontSize: 12,
+      fontWeight: FontWeight.normal,
+    ),
+    floatingLabelStyle: const TextStyle(
+      color: AppColors.grey,
+      fontSize: 12,
+      fontWeight: FontWeight.normal,
+    ),
+    contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
   );
 }

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:legged_robot_app/services/toast_service.dart';
@@ -8,12 +9,12 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 import '../services/talker_service.dart';
 
 class MainController extends GetxController {
-  GetStorage storageIp = GetStorage('Setting');
+  GetStorage storage = GetStorage('Setting');
   WebSocketChannel? channel;
   Timer? _heartbeatTimer;
 
-  RxString ipWebSocket = 'wss://192.168.123.99:8002'.obs;
-  RxString ipCamera = 'https://192.168.123.99:8889/d455f/'.obs;
+  Rx<TextEditingController> ipWebSocket = TextEditingController(text: 'wss://192.168.123.99:8002').obs; 
+  Rx<TextEditingController> ipCamera = TextEditingController(text: 'https://192.168.123.99:8889/d455f/').obs;
 
   RxString connectionRos = 'Disconnected'.obs;
   RxString robotType = 'G1'.obs;
@@ -25,26 +26,26 @@ class MainController extends GetxController {
 
   @override
   void onInit() async {
-    talker.info('MainController onInit ${storageIp.read('ip')}');
-
-    if (storageIp.read('ip') != null) {
-      ipWebSocket.value = storageIp.read('ip');
+    talker.info('MainController onInit ${storage.read('ip')}');
+    initRobotStorage();
+    if (storage.read('ip') != null) {
+      ipWebSocket.value = storage.read('ip');
     }
 
-    if (storageIp.read('camera') != null) {
-      ipCamera.value = storageIp.read('camera');
+    if (storage.read('camera') != null) {
+      ipCamera.value = storage.read('camera');
     }
-    if (storageIp.read('robotType') != null) {
-      robotType.value = storageIp.read('robotType');
+    if (storage.read('robotType') != null) {
+      robotType.value = storage.read('robotType');
     }
-    if (storageIp.read('linearSpeed') != null) {
-      linearSpeed.value = storageIp.read('linearSpeed');
+    if (storage.read('linearSpeed') != null) {
+      linearSpeed.value = storage.read('linearSpeed');
     }
-    if (storageIp.read('angularSpeed') != null) {
-      angularSpeed.value = storageIp.read('angularSpeed');
+    if (storage.read('angularSpeed') != null) {
+      angularSpeed.value = storage.read('angularSpeed');
     }
-    if (storageIp.read('samplingRate') != null) {
-      samplingRate.value = storageIp.read('samplingRate');
+    if (storage.read('samplingRate') != null) {
+      samplingRate.value = storage.read('samplingRate');
     }
     super.onInit();
   }
@@ -63,9 +64,65 @@ class MainController extends GetxController {
     super.onClose();
   }
 
+  void initRobotStorage() {
+    storage.write('Setting', [
+      {
+        'robType': 'G1',
+        'ip': 'ws://0.0.0.1:1',
+        'camera': 'http://000.0000:920',
+        'linearSpeed': 0.5,
+        'angularSpeed': 1.0,
+        'samplingRate': 0.1,
+      },
+      {
+        'robType': 'H1',
+        'ip': 'ws://0.0.0.1:2',
+        'camera': 'http://000.0000:930',
+        'linearSpeed': 0.5,
+        'angularSpeed': 1.0,
+        'samplingRate': 0.1,
+      },
+      {
+        'robType': 'B1',
+        'ip': 'ws://0.0.0.1:2',
+        'camera': 'http://000.0000:930',
+        'linearSpeed': 0.5,
+        'angularSpeed': 1.0,
+        'samplingRate': 0.1,
+      },
+      {
+        'robType': 'B1W',
+        'ip': 'ws://0.0.0.1:2',
+        'camera': 'http://000.0000:930',
+        'linearSpeed': 0.5,
+        'angularSpeed': 1.0,
+        'samplingRate': 0.1,
+      },
+    ]);
+  }
+void selectRobot(Map<String, dynamic> robot) {
+  robotType.value = robot['robType'];
+  ipWebSocket.value = robot['ip'];
+  ipCamera.value = robot['camera'];
+  linearSpeed.value = robot['linearSpeed'];
+  angularSpeed.value = robot['angularSpeed'];
+  samplingRate.value = robot['samplingRate'];
+
+  storage.write('robotType', robotType.value);
+  storage.write('ip', ipWebSocket.value);
+  storage.write('camera', ipCamera.value);
+  storage.write('linearSpeed', linearSpeed.value);
+  storage.write('angularSpeed', angularSpeed.value);
+  storage.write('samplingRate', samplingRate.value);
+
+  disconnect.value = false;
+  connectionRos.value = 'Connected';
+}
+
+
   void resetToDefault() {
-    ipWebSocket.value = 'wss://192.168.123.99:8002';
-    ipCamera.value = 'https://192.168.123.99:8889/d455f/';
+    ipWebSocket.value.text = 'wss://192.168.123.99:8002';
+    ipCamera.value.text = 'https://192.168.123.99:8889/d455f/';
     robotType.value = 'G1';
     linearSpeed.value = 0.5;
     angularSpeed.value = 1.0;
@@ -75,12 +132,12 @@ class MainController extends GetxController {
   }
 
   void applyIpRobot() async {
-    storageIp.write('ip', ipWebSocket.value);
-    storageIp.write('camera', ipCamera.value);
-    storageIp.write('robotType', robotType.value);
-    storageIp.write('linearSpeed', linearSpeed.value);
-    storageIp.write('angularSpeed', angularSpeed.value);
-    storageIp.write('samplingRate', samplingRate.value);
+    storage.write('ip', ipWebSocket.value);
+    storage.write('camera', ipCamera.value);
+    storage.write('robotType', robotType.value);
+    storage.write('linearSpeed', linearSpeed.value);
+    storage.write('angularSpeed', angularSpeed.value);
+    storage.write('samplingRate', samplingRate.value);
     talker.info('applyIpRobot');
     reDisconnectAndConnect();
   }
@@ -126,7 +183,7 @@ class MainController extends GetxController {
       connectionRos.value = 'Connecting';
       talker.info('connect_ws ${ipWebSocket.value}');
 
-      channel = WebSocketChannel.connect(Uri.parse(ipWebSocket.value));
+      channel = WebSocketChannel.connect(Uri.parse(ipWebSocket.value.text));
 
       await channel!.ready;
 

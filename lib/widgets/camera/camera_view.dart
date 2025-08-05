@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:get/get.dart';
 import '../../controllers/app_controller.dart';
+import '../../units/app_colors.dart';
 
 class CameraView extends StatelessWidget {
   final double? width;
@@ -19,16 +20,26 @@ class CameraView extends StatelessWidget {
         width: width ?? double.infinity,
         height: height,
         decoration: BoxDecoration(
-          color: Colors.black,
+          color: AppColors.scaffold,
           borderRadius: BorderRadius.circular(borderRadius),
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(borderRadius),
-          child: RTCVideoView(
-                      c.renderer,
-                      objectFit:
-                          RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
-                    ),
+          // child: RTCVideoView(
+          //             c.renderer,
+          //             objectFit:
+          //                 RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+          //           ),
+          child: Transform.scale(
+            scale: 1.13,
+            alignment: Alignment.center,
+            child: const SizedBox.expand(
+              child: HtmlElementView(
+                viewType: 'camera',
+                key: ValueKey('cameraView'),
+              ),
+            ),
+          ),
           // child: Center(
           //   child:
           //       kIsWeb

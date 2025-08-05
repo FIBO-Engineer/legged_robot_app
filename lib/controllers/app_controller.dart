@@ -1,10 +1,10 @@
-// import 'dart:ui_web' as ui;
+import 'dart:ui_web' as ui;
 //import 'package:flutter/foundation.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:get/get.dart';
 import 'package:legged_robot_app/controllers/main_conroller.dart';
 // ignore: deprecated_member_use, avoid_web_libraries_in_flutter
-//import 'dart:html';
+import 'dart:html';
 import 'package:http/http.dart' as http;
 
 class AppController extends GetxController {
@@ -16,22 +16,22 @@ class AppController extends GetxController {
     final MainController c = Get.find<MainController>();
 
     // if (kIsWeb) {
-    //   ui.platformViewRegistry.registerViewFactory('camera', (int viewId) {
-    //     final iFrame =
-    //         IFrameElement()
-    //           ..src = c.ipCamera.value
-    //           ..style.border = 'none'
-    //           ..style.width = '100%'
-    //           ..style.height = '100%'
-    //           ..style.overflow = 'hidden'
-    //           ..allowFullscreen = true
-    //           ..allow = 'autoplay'
-    //           ..style.pointerEvents = 'none'
-    //           ..setAttribute('muted', 'true');
-    //     return iFrame;
-    //   });
+      ui.platformViewRegistry.registerViewFactory('camera', (int viewId) {
+        final iFrame =
+            IFrameElement()
+              ..src = c.ipCamera.value.text
+              ..style.border = 'none'
+              ..style.width = '100%'
+              ..style.height = '100%'
+              ..style.overflow = 'hidden'
+              ..allowFullscreen = true
+              ..allow = 'autoplay'
+              ..style.pointerEvents = 'none'
+              ..setAttribute('muted', 'true');
+        return iFrame;
+      });
     // } else {
-      initWebRTC(c.ipCamera.value);
+      initWebRTC(c.ipCamera.value.text);
    // }
 
     super.onInit();

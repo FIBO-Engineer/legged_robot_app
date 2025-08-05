@@ -56,34 +56,29 @@ class DashboardScreen extends StatelessWidget {
         children: [
           Positioned.fill(child: _mapWidget()),
           Positioned(
-            top: 20,
-            right: 20,
+            top: 10,
+            right: 10,
             child: CameraView(
               width: screen.width * 0.3,
               height: screen.width * 0.3 * 9 / 16,
-              borderRadius: 12,
+              borderRadius: 10,
             ),
           ),
-          Positioned(top: 20, left: 20, child: _statusWidget(context)),
-          Positioned(bottom: 20, right: 20, child: _controlWidget()),
+          Positioned(top: 10, left: 10, child: _statusWidget(context)),
+          Positioned(bottom: 10, right: 10, child: _controlWidget()),
         ],
       );
     } else if (screen.isPortrait) {
       return Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 16, right: 16, left: 16),
-            child: AspectRatio(
-              aspectRatio: 16 / 9,
-              child: CameraView(borderRadius: 12),
-            ),
-          ),
+          AspectRatio(aspectRatio: 16 / 9, child: CameraView()),
+
           Expanded(
             child: Stack(
               children: [
                 Positioned.fill(child: _mapWidget()),
-                Positioned(top: 20, left: 20, child: _statusWidget(context)),
-                Positioned(bottom: 20, right: 20, child: _controlWidget()),
+                Positioned(top: 10, left: 10, child: _statusWidget(context)),
+                Positioned(bottom: 10, right: 10, child: _controlWidget()),
               ],
             ),
           ),
@@ -94,16 +89,16 @@ class DashboardScreen extends StatelessWidget {
         children: [
           Positioned.fill(child: _mapWidget()),
           Positioned(
-            top: 20,
-            right: 20,
+            top: 10,
+            right: 10,
             child: CameraView(
               width: screen.width * 0.35,
               height: screen.width * 0.35 * 9 / 16,
-              borderRadius: 12,
+              borderRadius: 10,
             ),
           ),
-          Positioned(top: 20, left: 20, child: _statusWidget(context)),
-          Positioned(bottom: 20, right: 20, child: _controlWidget()),
+          Positioned(top: 10, left: 10, child: _statusWidget(context)),
+          Positioned(bottom: 10, right: 10, child: _controlWidget()),
         ],
       );
     }
@@ -111,11 +106,11 @@ class DashboardScreen extends StatelessWidget {
 
   Widget _mapWidget() {
     return Container(
-      padding: const EdgeInsets.all(12),
-      margin: const EdgeInsets.all(12),
+      // padding: const EdgeInsets.all(12),
+      // margin: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.scaffold,
-        borderRadius: BorderRadius.circular(12),
+        color: AppColors.background,
+        // borderRadius: BorderRadius.circular(12),
       ),
       alignment: Alignment.center,
       child: const Text(
@@ -128,17 +123,19 @@ class DashboardScreen extends StatelessWidget {
   Widget _controlWidget() {
     return Row(
       children: [
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.card,
+            foregroundColor: AppColors.red,
+          ),
+          onPressed: () {},
+          child: Text("EMG", style: TextStyle(fontWeight: FontWeight.bold)),
+        ),
+        const SizedBox(width: 10),
         CircleButton(
           icon: Icons.workspaces_rounded,
           backgroundColor: AppColors.card,
           iconColor: Colors.white,
-          onPressed: () {},
-        ),
-        const SizedBox(width: 16),
-        CircleButton(
-          icon: Icons.error,
-          backgroundColor: AppColors.card,
-          iconColor: AppColors.red,
           onPressed: () {},
         ),
       ],
@@ -155,76 +152,91 @@ class DashboardScreen extends StatelessWidget {
             : 110;
     final double fontSize = (boxWidth / 10).clamp(9, 14);
 
-    return IntrinsicWidth(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _statusRow(
-            icon: Icons.flag,
-            value: '10.00, 2.48',
-            unit: 'm',
-            fontSize: fontSize,
-          ),
-          const SizedBox(height: 6),
-          _statusRow(
-            icon: Icons.navigation_rounded,
-            value: '90.05',
-            unit: 'deg',
-            fontSize: fontSize,
-          ),
-          const SizedBox(height: 6),
-          _statusRow(
-            icon: Icons.speed,
-            value: '1.05',
-            unit: 'm/s',
-            fontSize: fontSize,
-          ),
-        ],
-      ),
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _infoGroupBox(
+          children: [
+            _infoItem(
+              icon: Icons.link_off,
+              text: 'Disconnect',
+              fontSize: fontSize,
+            ),
+            _verticalDivider(),
+            _infoItem(
+              icon: Icons.battery_std,
+              text: '50 %',
+              fontSize: fontSize,
+            ),
+          ],
+        ),
+        const SizedBox(width: 10),
+        _infoGroupBox(
+          children: [
+            _infoItem(text: '10.00, 2.48', unit: 'm', fontSize: fontSize),
+            _verticalDivider(),
+            _infoItem(text: '90.25', unit: 'deg', fontSize: fontSize),
+            _verticalDivider(),
+            _infoItem(text: '1.05', unit: 'm/s', fontSize: fontSize),
+          ],
+        ),
+      ],
     );
   }
 
-  Widget _statusRow({
-    required IconData icon,
-    required String value,
-    required String unit,
-    double fontSize = 14,
-  }) {
+  Widget _infoGroupBox({required List<Widget> children}) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: const Color(0xFF232329),
-        borderRadius: BorderRadius.circular(6),
+        color: AppColors.card,
+        borderRadius: BorderRadius.circular(8),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
+      child: Row(mainAxisSize: MainAxisSize.min, children: children),
+    );
+  }
 
-        children: [
-          Icon(icon, color: AppColors.grey, size: fontSize * 1.2),
-          const SizedBox(width: 8),
-          Text(
-            value,
-            textAlign: TextAlign.left,
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: fontSize.clamp(8, 14),
-              letterSpacing: fontSize < 10 ? 0.2 : 1,
-              fontFamily: 'monospace',
-            ),
+  Widget _infoItem({
+    IconData? icon,
+    required String text,
+    String? unit,
+    required double fontSize,
+  }) {
+    return Row(
+      children: [
+        if (icon != null) ...[
+          Icon(icon, color: Colors.white, size: fontSize * 1.2),
+          const SizedBox(width: 4),
+        ],
+        Text(
+          text,
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: fontSize,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'monospace',
           ),
-          const SizedBox(width: 8),
+        ),
+        if (unit != null && unit.isNotEmpty) ...[
+          const SizedBox(width: 4),
           Text(
             unit,
-            textAlign: TextAlign.left,
             style: TextStyle(
               color: AppColors.grey,
+              fontSize: fontSize * 0.85,
               fontWeight: FontWeight.w500,
-              fontSize: fontSize.clamp(8, 12),
             ),
           ),
         ],
-      ),
+      ],
+    );
+  }
+
+  Widget _verticalDivider() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal:8),
+      width: 1,
+      height: 18,
+      color: AppColors.grey,
     );
   }
 }

@@ -7,10 +7,13 @@ import '../units/app_constants.dart';
 class AppNavigationBar extends StatelessWidget {
   final int selectedIndex;
   final ValueChanged<int> onTap;
+  final ValueNotifier<bool>? floatingNavExpanded;
+
   const AppNavigationBar({
     super.key,
     required this.selectedIndex,
     required this.onTap,
+    this.floatingNavExpanded,
   });
 
   @override
@@ -22,7 +25,11 @@ class AppNavigationBar extends StatelessWidget {
     } else if (screen.isPortrait) {
       return _BottomNavigation(selectedIndex: selectedIndex, onTap: onTap);
     } else {
-      return _FloatingNavigation(selectedIndex: selectedIndex, onTap: onTap);
+      return _FloatingNavigation(
+        selectedIndex: selectedIndex,
+        onTap: onTap,
+        isExpandedNotifier: floatingNavExpanded!,
+      );
     }
   }
 }
@@ -35,42 +42,43 @@ class _SidebarNavigation extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: 56,
-      color: AppColors.background,
+      color: AppColors.scaffold,
       padding: const EdgeInsets.symmetric(vertical: 16),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Icon(Icons.android, color: Colors.white, size: 24),
-
+          SizedBox(height: 20),
           Column(
             children: [
               _NavIcon(
                 icon: Icons.dashboard,
+                size: 20,
                 selected: selectedIndex == 0,
                 onTap: () => onTap(0),
               ),
-              SizedBox(height: 16),
+              SizedBox(height: 10),
               _NavIcon(
                 icon: Icons.gamepad,
+                size: 20,
                 selected: selectedIndex == 1,
                 onTap: () => onTap(1),
               ),
-              SizedBox(height: 16),
+              SizedBox(height: 10),
               _NavIcon(
                 icon: Icons.flag,
+                size: 20,
                 selected: selectedIndex == 2,
                 onTap: () => onTap(2),
               ),
-              SizedBox(height: 16),
+              SizedBox(height: 10),
               _NavIcon(
                 icon: Icons.settings,
+                size: 20,
                 selected: selectedIndex == 3,
                 onTap: () => onTap(3),
               ),
             ],
           ),
-
-          Icon(Icons.circle, color: AppColors.red, size: 10),
         ],
       ),
     );
@@ -111,50 +119,107 @@ class _BottomNavigation extends StatelessWidget {
 class _FloatingNavigation extends StatelessWidget {
   final int selectedIndex;
   final ValueChanged<int> onTap;
-  const _FloatingNavigation({required this.selectedIndex, required this.onTap});
+  final ValueNotifier<bool> isExpandedNotifier;
+
+  const _FloatingNavigation({
+    required this.selectedIndex,
+    required this.onTap,
+    required this.isExpandedNotifier,
+  });
+
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return ValueListenableBuilder<bool>(
+      valueListenable: isExpandedNotifier,
+      builder: (context, isExpanded, _) {
+        return Center(
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: AppColors.card,
+              borderRadius: BorderRadius.circular(isExpanded ? 32 : 24),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (isExpanded) ...[
+                  _navButton(0, Icons.dashboard),
+                  _spacer(),
+                  _navButton(1, Icons.gamepad),
+                  _spacer(),
+                  _navButton(2, Icons.flag),
+                  _spacer(),
+                  _navButton(3, Icons.settings),
+                  _spacer(),
+                  _toggleButton(isExpanded),
+                ] else ...[
+                  _navButton(selectedIndex, _iconForIndex(selectedIndex)),
+                  _spacer(),
+                  _toggleButton(isExpanded),
+                ],
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _toggleButton(bool isExpanded) {
+    return GestureDetector(
+      onTap: () => isExpandedNotifier.value = !isExpanded,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 2),
+        width: 28,
+        height: 28,
         decoration: BoxDecoration(
+          shape: BoxShape.circle,
           color: AppColors.scaffold,
-          borderRadius: BorderRadius.circular(28),
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _NavIcon(
-              icon: Icons.dashboard,
-              size: 20,
-              selected: selectedIndex == 0,
-              onTap: () => onTap(0),
-            ),
-            const SizedBox(width: 28),
-            _NavIcon(
-              icon: Icons.gamepad,
-              size: 20,
-              selected: selectedIndex == 1,
-              onTap: () => onTap(1),
-            ),
-            const SizedBox(width: 28),
-            _NavIcon(
-              icon: Icons.flag,
-              size: 20,
-              selected: selectedIndex == 2,
-              onTap: () => onTap(2),
-            ),
-            const SizedBox(width: 28),
-            _NavIcon(
-              icon: Icons.settings,
-              size: 20,
-              selected: selectedIndex == 3,
-              onTap: () => onTap(3),
-            ),
-          ],
+        child: Icon(
+          isExpanded ? Icons.close : Icons.more_horiz,
+          size: 14,
+          color: Colors.white70,
         ),
       ),
     );
+  }
+
+  Widget _navButton(int index, IconData icon) {
+    final selected = selectedIndex == index;
+    final color = selected ? AppColors.primary : AppColors.grey;
+
+    return GestureDetector(
+      onTap: () {
+        onTap(index);
+      },
+      child: Container(
+        width: 24,
+        height: 24,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: Colors.transparent,
+        ),
+        child: Icon(icon, color: color, size: 18),
+      ),
+    );
+  }
+
+  Widget _spacer() => const SizedBox(width: 12);
+
+  IconData _iconForIndex(int index) {
+    switch (index) {
+      case 0:
+        return Icons.dashboard;
+      case 1:
+        return Icons.gamepad;
+      case 2:
+        return Icons.flag;
+      case 3:
+        return Icons.settings;
+      default:
+        return Icons.help_outline;
+    }
   }
 }
 
@@ -166,9 +231,9 @@ class _NavIcon extends StatelessWidget {
 
   const _NavIcon({
     required this.icon,
-    this.size = 24,
     required this.selected,
     required this.onTap,
+    this.size = 24.0,
   });
 
   @override
@@ -185,6 +250,8 @@ class _NavIcon extends StatelessWidget {
 }
 
 ///-------------------------- Responsive Wrapper -------------------------- ///
+final ValueNotifier<bool> floatingNavExpanded = ValueNotifier(true);
+
 Widget buildResponsiveNavBar(BuildContext context) {
   final navIndex = getNavIndexByRoute(Get.currentRoute);
   final screen = ScreenSize(context);
@@ -207,6 +274,7 @@ Widget buildResponsiveNavBar(BuildContext context) {
           break;
       }
     },
+    floatingNavExpanded: floatingNavExpanded,
   );
 
   if (screen.isDesktop || screen.isTablet) {
@@ -217,7 +285,7 @@ Widget buildResponsiveNavBar(BuildContext context) {
     return Positioned(
       left: 0,
       right: 0,
-      bottom: 20,
+      bottom: 10,
       child: Center(child: navBar),
     );
   }

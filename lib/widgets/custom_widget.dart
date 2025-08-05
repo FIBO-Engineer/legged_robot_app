@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../units/app_colors.dart';
+
 class CircleButton extends StatelessWidget {
   final IconData icon;
   final Color backgroundColor;
@@ -11,10 +13,10 @@ class CircleButton extends StatelessWidget {
   const CircleButton({
     super.key,
     required this.icon,
-    this.backgroundColor = const Color(0xFF232329),
+    this.backgroundColor = AppColors.card,
     this.iconColor = Colors.white,
-    this.size = 48,
-    this.iconSize = 22,
+    this.size = 32,
+    this.iconSize = 18,
     required this.onPressed,
   });
 
