@@ -41,7 +41,6 @@ dependencies:
   talker_flutter: ^4.9.3
   get_storage: ^2.1.1
   toastification: ^3.0.3
-  video_player: ^2.10.0
   flutter_webrtc: ^1.0.0
 
 dev_dependencies:

@@ -14,7 +14,7 @@ class MainController extends GetxController {
   Timer? _heartbeatTimer;
 
   Rx<TextEditingController> ipWebSocket = TextEditingController(text: 'wss://192.168.123.99:8002').obs; 
-  Rx<TextEditingController> ipCamera = TextEditingController(text: 'https://192.168.123.99:8889/d455f/').obs;
+  Rx<TextEditingController> ipCamera = TextEditingController(text: 'http://localhost:8889/my_camera/whep').obs; //http://localhost:8889/mystream/
 
   RxString connectionRos = 'Disconnected'.obs;
   RxString robotType = 'G1'.obs;
