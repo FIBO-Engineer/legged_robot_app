@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:legged_robot_app/units/app_colors.dart' show AppColors;
 import '../controllers/main_conroller.dart';
@@ -50,6 +51,8 @@ class SettingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screen = ScreenSize(context);
+    MainController controller = Get.find();
+    final theme = Theme.of(context);
 
     if (screen.isDesktop || screen.isTablet) {
       return Padding(
@@ -57,11 +60,11 @@ class SettingScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            _profileWidget(),
+            _profileWidget(controller, theme),
             const SizedBox(height: 16),
-            _deviceWidget(),
+            _deviceWidget(controller, theme, screen),
             const SizedBox(height: 16),
-            _motionControlWidget(),
+            _motionControlWidget(controller, theme, screen),
           ],
         ),
       );
@@ -71,11 +74,11 @@ class SettingScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            _profileWidget(),
+            _profileWidget(controller, theme),
             const SizedBox(height: 16),
-            _deviceWidgetColumn(),
+            _deviceWidget(controller, theme, screen),
             const SizedBox(height: 16),
-            _motionControlColumn(),
+            _motionControlWidget(controller, theme, screen),
           ],
         ),
       );
@@ -85,28 +88,27 @@ class SettingScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            _profileWidget(),
+            _profileWidget(controller, theme),
             const SizedBox(height: 16),
-            _deviceWidget(),
+            _deviceWidget(controller, theme, screen),
             const SizedBox(height: 16),
-            _motionControlWidget(),
+            _motionControlWidget(controller, theme, screen),
           ],
         ),
       );
     }
   }
 
-  Widget _profileWidget() {
-    MainController controller = Get.find();
+  Widget _profileWidget(MainController controller, ThemeData theme) {
     final List<Map<String, dynamic>> profiles = List<Map<String, dynamic>>.from(
       controller.storage.read('Setting') ?? [],
     );
     return Obx(
       () => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
         decoration: BoxDecoration(
-          color: Colors.grey.shade900,
-          borderRadius: BorderRadius.circular(20),
+          color: AppColors.card,
+          borderRadius: BorderRadius.circular(28),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -114,34 +116,31 @@ class SettingScreen extends StatelessWidget {
               profiles.map((profile) {
                 final robType = profile['robType'];
                 final isSelected = robType == controller.robotType.value;
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: TextButton.icon(
-                    onPressed:
-                        () => controller.selectRobot(
-                          Map<String, dynamic>.from(profile),
-                        ),
-                    icon: Icon(
-                      Icons.person,
-                      color: isSelected ? Colors.lightBlue : Colors.grey,
-                      size: 16,
+                return TextButton.icon(
+                  onPressed: () {
+                    controller.selectRobot(Map<String, dynamic>.from(profile));
+                  },
+                  icon: Icon(
+                    Icons.person,
+                    color: isSelected ? AppColors.primary : AppColors.kNavColor,
+                    size: 16,
+                  ),
+                  label: Text(
+                    robType,
+                    style: TextStyle(
+                      color:
+                          isSelected ? AppColors.primary : AppColors.kNavColor,
+                      fontSize: 12,
                     ),
-                    label: Text(
-                      robType,
-                      style: TextStyle(
-                        color: isSelected ? Colors.lightBlue : Colors.grey,
-                        fontSize: 12,
-                      ),
+                  ),
+                  style: TextButton.styleFrom(
+                    backgroundColor:
+                        isSelected ? AppColors.scaffold : Colors.transparent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
                     ),
-                    style: TextButton.styleFrom(
-                      backgroundColor:
-                          isSelected ? Colors.black : Colors.transparent,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      minimumSize: const Size(0, 32),
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                    ),
+                    minimumSize: const Size(0, 36),
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
                   ),
                 );
               }).toList(),
@@ -150,127 +149,154 @@ class SettingScreen extends StatelessWidget {
     );
   }
 
-  Widget _deviceWidget() {
-    MainController controller = Get.find();
+  Widget _deviceWidget(
+    MainController controller,
+    ThemeData theme,
+    ScreenSize screen,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Device', style: TextStyle(color: Colors.white, fontSize: 16)),
+        Text('Device', style: theme.textTheme.titleMedium),
         const SizedBox(height: 8),
-        Row(
-          children: [
-            Expanded(
-              child: TextField(
-                controller: controller.ipWebSocket.value,
-                decoration: InputDecoration(labelText: "Address"), style: TextStyle(color: Colors.white, fontSize: 14)
-              ),
+        screen.isPortrait
+            ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  height: 40,
+                  child: TextField(
+                    controller: controller.ipWebSocket.value,
+                    decoration: InputDecoration(labelText: "Address"),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(
+                        RegExp(r'[http:/\.0-9:]'),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  height: 40,
+                  child: TextField(
+                    controller: controller.ipCamera.value,
+                    decoration: InputDecoration(labelText: "Camera"),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(
+                        RegExp(r'[http:/\.0-9:]'),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 46),
+                    backgroundColor: Colors.blue,
+                  ),
+                  child: Text('Connect', style: theme.textTheme.labelMedium),
+                ),
+              ],
+            )
+            : Row(
+              children: [
+                Expanded(
+                  child: SizedBox(
+                    height: 40,
+                    child: TextField(
+                      controller: controller.ipWebSocket.value,
+                      decoration: InputDecoration(labelText: "Address"),
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(
+                          RegExp(r'[http:/\.0-9:]'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: SizedBox(
+                    height: 40,
+                    child: TextField(
+                      controller: controller.ipCamera.value,
+                      decoration: InputDecoration(labelText: "Camera"),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size(120, 46),
+                    backgroundColor: Colors.blue,
+                  ),
+                  child: Text('Connect', style: theme.textTheme.labelMedium),
+                ),
+              ],
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: TextField(
-                controller: controller.ipCamera.value,
-                decoration: InputDecoration(labelText: "Camera"), style: TextStyle(color: Colors.white, fontSize: 14)
-              ),
-            ),
-            const SizedBox(width: 16),
-            ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
-              child: const Text('Connect'),
-            ),
-          ],
-        ),
       ],
     );
   }
 
-  Widget _deviceWidgetColumn() {
-    MainController controller = Get.find();
+  Widget _motionControlWidget(
+    MainController controller,
+    ThemeData theme,
+    ScreenSize screen,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Device', style: TextStyle(color: Colors.white, fontSize: 16)),
+        Text('Motion Control', style: theme.textTheme.titleMedium),
         const SizedBox(height: 8),
-        TextField(
-          controller: controller.ipWebSocket.value,
-          decoration: InputDecoration(labelText: "Address"), style: TextStyle(color: Colors.white, fontSize: 14)
-        ),
-        const SizedBox(height: 12),
-        TextField(
-          controller: controller.ipCamera.value,
-          decoration: InputDecoration(labelText: "Camera"), style: TextStyle(color: Colors.white, fontSize: 14)
-        ),
-        const SizedBox(height: 12),
-        ElevatedButton(
-          onPressed: () {},
-          style: ElevatedButton.styleFrom(
-            minimumSize: const Size.fromHeight(40),
-            backgroundColor: Colors.blue,
-          ),
-          child: const Text('Connect'),
-        ),
-      ],
-    );
-  }
-
-  Widget _motionControlWidget() {
-    final c = Get.find<MainController>();
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Motion Control',
-          style: TextStyle(color: Colors.white, fontSize: 16),
-        ),
-        const SizedBox(height: 8),
-        Row(
-          children: [
-            Expanded(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 300),
-                child: _sliderTile('Linear speed', c.linearSpeed),
-              ),
+        screen.isPortrait
+            ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _sliderTile('Linear Speed', controller.linearSpeed),
+                const SizedBox(height: 8),
+                _sliderTile('Angular Speed', controller.angularSpeed),
+                const SizedBox(height: 8),
+                _sliderTile('Sampling Rate', controller.samplingRate),
+              ],
+            )
+            : Row(
+              children: [
+                Expanded(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 300),
+                    child: _sliderTile('Linear Speed', controller.linearSpeed),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 300),
+                    child: _sliderTile(
+                      'Angular Speed',
+                      controller.angularSpeed,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 300),
+                    child: _sliderTile(
+                      'Sampling Rate',
+                      controller.samplingRate,
+                    ),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 300),
-                child: _sliderTile('Angular speed', c.angularSpeed),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 300),
-                child: _sliderTile('Sampling rate', c.samplingRate),
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _motionControlColumn() {
-    final c = Get.find<MainController>();
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Motion Control',
-          style: TextStyle(color: Colors.white, fontSize: 18),
-        ),
-        const SizedBox(height: 8),
-        _sliderTile('Linear speed', c.linearSpeed),
-        const SizedBox(height: 8),
-        _sliderTile('Angular speed', c.angularSpeed),
-        const SizedBox(height: 8),
-        _sliderTile('Sampling rate', c.samplingRate),
       ],
     );
   }
 
   Widget _sliderTile(String label, RxDouble value) {
+    final theme = Theme.of(Get.context!);
     return Obx(
       () => Container(
         padding: const EdgeInsets.all(8),
@@ -281,10 +307,12 @@ class SettingScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label, style: TextStyle(color: AppColors.grey, fontSize: 12)),
-            const SizedBox(height: 4),
+            Padding(
+              padding: EdgeInsets.only(left: 8),
+              child: Text(label, style: theme.textTheme.titleSmall),
+            ),
+
             Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Expanded(
                   child: SliderTheme(
@@ -302,19 +330,17 @@ class SettingScreen extends StatelessWidget {
                       min: 0,
                       max: 1,
                       activeColor: Colors.blue,
-                      inactiveColor: Colors.grey.shade700,
+                      inactiveColor: AppColors.grey,
                     ),
                   ),
                 ),
-                const SizedBox(width: 16),
-                SizedBox(
-                  width: 28,
-                  child: Text(
-                    value.value.toStringAsFixed(1),
-                    textAlign: TextAlign.right,
-                    style: const TextStyle(color: Colors.white, fontSize: 14),
-                  ),
+                const SizedBox(width: 8),
+                Text(
+                  value.value.toStringAsFixed(1),
+                  textAlign: TextAlign.right,
+                  style: theme.textTheme.titleLarge,
                 ),
+                const SizedBox(width: 4),
               ],
             ),
           ],

@@ -8,5 +8,6 @@ class AppColors {
   static const red = Color(0xFFFD5555);
   static const orange = Color(0xFFFCC101);
   static const green = Color(0xFF00DC72);
-  static const grey = Color(0xFF969696);
+  static const grey = Color(0xFFADB3BC);
+  static const Color kNavColor = Color(0xFFADB3BC);
 }

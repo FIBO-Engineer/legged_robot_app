@@ -102,8 +102,8 @@ class MainController extends GetxController {
   }
 void selectRobot(Map<String, dynamic> robot) {
   robotType.value = robot['robType'];
-  ipWebSocket.value = robot['ip'];
-  ipCamera.value = robot['camera'];
+  ipWebSocket.value.text = robot['ip'];
+  ipCamera.value.text = robot['camera'];
   linearSpeed.value = robot['linearSpeed'];
   angularSpeed.value = robot['angularSpeed'];
   samplingRate.value = robot['samplingRate'];

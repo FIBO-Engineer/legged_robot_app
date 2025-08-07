@@ -30,18 +30,19 @@ class MyApp extends StatelessWidget {
         title: 'Robot Control',
         theme: ThemeData(
           brightness: Brightness.dark,
-          primaryColor: Color(0xFF02ABFF),
-          scaffoldBackgroundColor: Color(0xFF101010),
+          primaryColor: AppColors.primary,
+          scaffoldBackgroundColor: AppColors.background,
           appBarTheme: AppBarTheme(
-            backgroundColor: Color(0xFF09090B),
+            backgroundColor: AppColors.background,
             elevation: 0,
             iconTheme: IconThemeData(color: Colors.white),
             titleTextStyle: TextStyle(color: Colors.white, fontSize: 20),
           ),
           colorScheme: ColorScheme.dark(
-            primary: Color(0xFF02ABFF),
-            secondary: Color(0xFF02ABFF),
+            primary: AppColors.primary,
+            secondary: AppColors.primary,
           ),
+          textTheme: textTheme(),
           inputDecorationTheme: inputDecorationTheme(),
           progressIndicatorTheme: ProgressIndicatorThemeData(
             color: AppColors.primary,

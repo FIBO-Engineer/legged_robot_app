@@ -61,7 +61,7 @@ class DashboardScreen extends StatelessWidget {
             child: CameraView(
               width: screen.width * 0.3,
               height: screen.width * 0.3 * 9 / 16,
-              borderRadius: 10,
+              borderRadius: 8,
             ),
           ),
           Positioned(top: 10, left: 10, child: _statusWidget(context)),
@@ -94,7 +94,7 @@ class DashboardScreen extends StatelessWidget {
             child: CameraView(
               width: screen.width * 0.35,
               height: screen.width * 0.35 * 9 / 16,
-              borderRadius: 10,
+              borderRadius: 8,
             ),
           ),
           Positioned(top: 10, left: 10, child: _statusWidget(context)),
@@ -129,7 +129,7 @@ class DashboardScreen extends StatelessWidget {
             foregroundColor: AppColors.red,
           ),
           onPressed: () {},
-          child: Text("EMG", style: TextStyle(fontWeight: FontWeight.bold)),
+          child: Text("EMG", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
         ),
         const SizedBox(width: 10),
         CircleButton(

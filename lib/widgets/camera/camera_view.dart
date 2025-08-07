@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:get/get.dart';
+import 'package:legged_robot_app/units/app_colors.dart';
 import '../../controllers/app_controller.dart';
 
 class CameraView extends StatelessWidget {
@@ -19,7 +20,7 @@ class CameraView extends StatelessWidget {
         width: width ?? double.infinity,
         height: height ?? 300,
         decoration: BoxDecoration(
-          color: Colors.black,
+          color: AppColors.scaffold,
           borderRadius: BorderRadius.circular(borderRadius),
         ),
         child: Stack(
@@ -31,22 +32,29 @@ class CameraView extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.error, color: Colors.red, size: 48),
+                    Icon(Icons.error, color: Colors.red, size: 32),
                     SizedBox(height: 8),
                     Text(
-                      "เชื่อมต่อกล้องไม่ได้",
-                      style: TextStyle(color: Colors.white, fontSize: 16),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      c.errorMessage.value,
-                      style: TextStyle(color: Colors.red, fontSize: 12),
-                      textAlign: TextAlign.center,
+                      "Can't connect to the camera",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.normal,
+                      ),
                     ),
                     SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: c.restart,
-                      child: Text('ลองใหม่'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.background,
+                      ),
+                      child: Text(
+                        'Refresh',
+                        style: TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 12,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -65,7 +73,7 @@ class CameraView extends StatelessWidget {
                           filterQuality: FilterQuality.medium,
                         )
                         : Container(
-                          color: Colors.black,
+                          color: AppColors.background,
                           child: Center(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -73,7 +81,7 @@ class CameraView extends StatelessWidget {
                                 CircularProgressIndicator(color: Colors.white),
                                 SizedBox(height: 16),
                                 Text(
-                                  'กำลังโหลดวิดีโอ...',
+                                  'Loading...',
                                   style: TextStyle(color: Colors.white),
                                 ),
                               ],
