@@ -3,6 +3,7 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:get/get.dart';
 import 'package:legged_robot_app/units/app_colors.dart';
 import '../../controllers/app_controller.dart';
+import '../custom_widget.dart';
 
 class CameraView extends StatelessWidget {
   final double? width;
@@ -20,7 +21,7 @@ class CameraView extends StatelessWidget {
         width: width ?? double.infinity,
         height: height ?? 300,
         decoration: BoxDecoration(
-          color: AppColors.scaffold,
+          color: AppColors.card,
           borderRadius: BorderRadius.circular(borderRadius),
         ),
         child: Stack(
@@ -32,8 +33,6 @@ class CameraView extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.error, color: Colors.red, size: 32),
-                    SizedBox(height: 8),
                     Text(
                       "Can't connect to the camera",
                       style: TextStyle(
@@ -43,18 +42,13 @@ class CameraView extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 16),
-                    ElevatedButton(
+                    CircleButton(
+                      size: 40,
+                      iconSize: 20,
+                      icon: Icons.refresh_rounded,
+                      backgroundColor: AppColors.background,
+                      iconColor: Colors.white,
                       onPressed: c.restart,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.background,
-                      ),
-                      child: Text(
-                        'Refresh',
-                        style: TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 12,
-                          color: Colors.white,
-                        ),
-                      ),
                     ),
                   ],
                 ),

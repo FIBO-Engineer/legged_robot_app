@@ -137,7 +137,7 @@ class _FloatingNavigation extends StatelessWidget {
             duration: const Duration(milliseconds: 300),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: AppColors.card,
+              color: AppColors.scaffold,
               borderRadius: BorderRadius.circular(isExpanded ? 32 : 24),
             ),
             child: Row(

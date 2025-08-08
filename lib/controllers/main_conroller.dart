@@ -6,141 +6,386 @@ import 'package:get_storage/get_storage.dart';
 import 'package:legged_robot_app/services/toast_service.dart';
 import 'package:toastification/toastification.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+import '../models/robot_profile.dart';
 import '../services/talker_service.dart';
 
 class MainController extends GetxController {
   GetStorage storage = GetStorage('Setting');
   WebSocketChannel? channel;
-  Timer? _heartbeatTimer;
-
-  Rx<TextEditingController> ipWebSocket = TextEditingController(text: 'wss://192.168.123.99:8002').obs; 
-  Rx<TextEditingController> ipCamera = TextEditingController(text: 'http://localhost:8889/my_camera/whep').obs; //http://localhost:8889/mystream/
-
+  Timer? _heartbeatTimer;  
+  
   RxString connectionRos = 'Disconnected'.obs;
-  RxString robotType = 'G1'.obs;
   RxBool disconnect = true.obs;
 
-  RxDouble samplingRate = 0.1.obs;
-  RxDouble angularSpeed = 1.0.obs;
-  RxDouble linearSpeed = 0.5.obs;
+  // Rx<TextEditingController> ipWebSocket =
+  //     TextEditingController(text: 'wss://192.168.123.99:8002').obs;
+  // Rx<TextEditingController> ipCamera =
+  //     TextEditingController(
+  //       text: 'http://localhost:8889/my_camera/whep',
+  //     ).obs; //http://localhost:8889/mystream/
+  // RxString robotType = ''.obs;
+
+  // final profiles = <Map<String, dynamic>>[].obs;
+
+  // RxDouble samplingRate = 0.1.obs;
+  // RxDouble angularSpeed = 1.0.obs;
+  // RxDouble linearSpeed = 0.5.obs;
+
+  // final box = GetStorage('app');             // ชื่อกล่องตามใจชอบ
+  // final profiles = <RobotProfile>[].obs;     // โปรไฟล์แบบ reactive
+  // final selectedIndex = 0.obs;
+
+  // // UI controllers (ไม่ต้อง Rx)
+  // final ipWebSocket = TextEditingController();
+  // final ipCamera = TextEditingController();
+
+  // final robotType = ''.obs;
+
+  // final samplingRate = 0.1.obs;
+  // final angularSpeed  = 1.0.obs;
+  // final linearSpeed   = 0.5.obs;
+
+  // static const kProfiles = 'profiles';
+  // static const kSelected = 'selectedIndex';
+
+  // @override
+  // void onInit() async {
+  //   talker.info('MainController onInit ${storage.read('ip')}');
+  //   initRobotStorage();
+  //   if (storage.read('ip') != null) {
+  //     ipWebSocket.value = storage.read('ip');
+  //   }
+
+  //   if (storage.read('camera') != null) {
+  //     ipCamera.value = storage.read('camera');
+  //   }
+  //   if (storage.read('robotType') != null) {
+  //     robotType.value = storage.read('robotType');
+  //   }
+  //   if (storage.read('linearSpeed') != null) {
+  //     linearSpeed.value = storage.read('linearSpeed');
+  //   }
+  //   if (storage.read('angularSpeed') != null) {
+  //     angularSpeed.value = storage.read('angularSpeed');
+  //   }
+  //   if (storage.read('samplingRate') != null) {
+  //     samplingRate.value = storage.read('samplingRate');
+  //   }
+  //   super.onInit();
+  // }
+
+  // @override
+  // void onReady() {
+  //   // Get called after widget is rendered on the screen
+
+  //   super.onReady();
+  // }
+
+  // @override
+  // void onClose() {
+  //   //Get called when controller is removed from memory
+  //   // talker.info('blank_controller / close');
+  //   super.onClose();
+  // }
+
+  // void initRobotStorage() {
+  //   storage.write('Setting', [
+  //     {
+  //       'robType': 'G1',
+  //       'ip': 'ws://0.0.0.1:1',
+  //       'camera': 'http://000.0000:920',
+  //       'linearSpeed': 0.5,
+  //       'angularSpeed': 1.0,
+  //       'samplingRate': 0.1,
+  //     },
+  //     {
+  //       'robType': 'H1',
+  //       'ip': 'ws://0.0.0.1:2',
+  //       'camera': 'http://000.0000:930',
+  //       'linearSpeed': 0.5,
+  //       'angularSpeed': 1.0,
+  //       'samplingRate': 0.1,
+  //     },
+  //     {
+  //       'robType': 'B1',
+  //       'ip': 'ws://0.0.0.1:2',
+  //       'camera': 'http://000.0000:930',
+  //       'linearSpeed': 0.5,
+  //       'angularSpeed': 1.0,
+  //       'samplingRate': 0.1,
+  //     },
+  //     {
+  //       'robType': 'B1W',
+  //       'ip': 'ws://0.0.0.1:2',
+  //       'camera': 'http://000.0000:930',
+  //       'linearSpeed': 0.5,
+  //       'angularSpeed': 1.0,
+  //       'samplingRate': 0.1,
+  //     },
+  //   ]);
+  // }
+
+  // void selectRobot(Map<String, dynamic> robot) {
+  //   robotType.value = robot['robType'];
+  //   ipWebSocket.value.text = robot['ip'];
+  //   ipCamera.value.text = robot['camera'];
+  //   linearSpeed.value = robot['linearSpeed'];
+  //   angularSpeed.value = robot['angularSpeed'];
+  //   samplingRate.value = robot['samplingRate'];
+
+  //   storage.write('robotType', robotType.value);
+  //   storage.write('ip', ipWebSocket.value);
+  //   storage.write('camera', ipCamera.value);
+  //   storage.write('linearSpeed', linearSpeed.value);
+  //   storage.write('angularSpeed', angularSpeed.value);
+  //   storage.write('samplingRate', samplingRate.value);
+
+  //   disconnect.value = false;
+  //   connectionRos.value = 'Connected';
+  // }
+
+  // void resetToDefault() {
+  //   ipWebSocket.value.text = 'wss://192.168.123.99:8002';
+  //   ipCamera.value.text = 'https://192.168.123.99:8889/d455f/';
+  //   robotType.value = 'G1';
+  //   linearSpeed.value = 0.5;
+  //   angularSpeed.value = 1.0;
+  //   samplingRate.value = 0.1;
+  //   applyIpRobot();
+  //   talker.info('resetToDefault');
+  // }
+
+  // void applyIpRobot() async {
+  //   storage.write('ip', ipWebSocket.value);
+  //   storage.write('camera', ipCamera.value);
+  //   storage.write('robotType', robotType.value);
+  //   storage.write('linearSpeed', linearSpeed.value);
+  //   storage.write('angularSpeed', angularSpeed.value);
+  //   storage.write('samplingRate', samplingRate.value);
+  //   talker.info('applyIpRobot');
+  //   reDisconnectAndConnect();
+  // }
+
+   // Use a consistent storage box name; 'app' is fine.
+  final box = GetStorage('app');
+
+  // Keys
+  static const kProfiles = 'profiles';
+  static const kSelected = 'selectedIndex';
+  static const kRobotType = 'robotType';
+  static const kIp = 'ip';
+  static const kCamera = 'camera';
+  static const kLinear = 'linearSpeed';
+  static const kAngular = 'angularSpeed';
+  static const kSample = 'samplingRate';
+
+  // WebSocketChannel? channel;
+  // Timer? _heartbeatTimer;
+
+  // Keep your current UI controllers as Rx so your widgets don’t change
+  final Rx<TextEditingController> ipWebSocket =
+      TextEditingController(text: '').obs;
+  final Rx<TextEditingController> ipCamera =
+      TextEditingController(text: '').obs;
+
+  // final RxString connectionRos = 'Disconnected'.obs;
+  // final RxBool disconnect = true.obs;
+
+  final RxString robotType = ''.obs;
+
+  // Reactive profiles list (list of maps to match your current UI)
+  final profiles = <Map<String, dynamic>>[].obs;
+
+  // Which profile is selected
+  final selectedIndex = 0.obs;
+
+  // Motion values
+  final RxDouble samplingRate = 0.1.obs;
+  final RxDouble angularSpeed = 1.0.obs;
+  final RxDouble linearSpeed = 0.5.obs;
 
   @override
-  void onInit() async {
-    talker.info('MainController onInit ${storage.read('ip')}');
-    initRobotStorage();
-    if (storage.read('ip') != null) {
-      ipWebSocket.value = storage.read('ip');
-    }
-
-    if (storage.read('camera') != null) {
-      ipCamera.value = storage.read('camera');
-    }
-    if (storage.read('robotType') != null) {
-      robotType.value = storage.read('robotType');
-    }
-    if (storage.read('linearSpeed') != null) {
-      linearSpeed.value = storage.read('linearSpeed');
-    }
-    if (storage.read('angularSpeed') != null) {
-      angularSpeed.value = storage.read('angularSpeed');
-    }
-    if (storage.read('samplingRate') != null) {
-      samplingRate.value = storage.read('samplingRate');
-    }
+  void onInit() {
     super.onInit();
-  }
 
-  @override
-  void onReady() {
-    // Get called after widget is rendered on the screen
+    // Seed default profiles only once (if empty)
+    _ensureSeededProfiles();
 
-    super.onReady();
+    // Load profiles
+    final raw = box.read<List>(kProfiles) ?? [];
+    profiles.assignAll(raw.map((e) => Map<String, dynamic>.from(e)));
+
+    // Restore selected index
+    selectedIndex.value = (box.read(kSelected) ?? 0) as int;
+    if (profiles.isNotEmpty) {
+      selectedIndex.value =
+          selectedIndex.value.clamp(0, profiles.length - 1);
+    } else {
+      selectedIndex.value = 0;
+    }
+
+    // Restore last-used scalar values (optional; UI will also sync from selected profile)
+    robotType.value = (box.read(kRobotType) ?? '') as String;
+
+    final ipStr = (box.read(kIp) ?? '') as String;
+    final camStr = (box.read(kCamera) ?? '') as String;
+    ipWebSocket.value.text = ipStr;
+    ipCamera.value.text = camStr;
+
+    linearSpeed.value = ((box.read(kLinear) ?? 0.5) as num).toDouble();
+    angularSpeed.value = ((box.read(kAngular) ?? 1.0) as num).toDouble();
+    samplingRate.value = ((box.read(kSample) ?? 0.1) as num).toDouble();
+
+    // If storage had nothing, sync UI from selected profile
+    if (ipStr.isEmpty && profiles.isNotEmpty) {
+      _applySelectionToFields();
+    }
   }
 
   @override
   void onClose() {
-    //Get called when controller is removed from memory
-    // talker.info('blank_controller / close');
+    _heartbeatTimer?.cancel();
     super.onClose();
   }
 
-  void initRobotStorage() {
-    storage.write('Setting', [
-      {
-        'robType': 'G1',
-        'ip': 'ws://0.0.0.1:1',
-        'camera': 'http://000.0000:920',
-        'linearSpeed': 0.5,
-        'angularSpeed': 1.0,
-        'samplingRate': 0.1,
-      },
-      {
-        'robType': 'H1',
-        'ip': 'ws://0.0.0.1:2',
-        'camera': 'http://000.0000:930',
-        'linearSpeed': 0.5,
-        'angularSpeed': 1.0,
-        'samplingRate': 0.1,
-      },
-      {
-        'robType': 'B1',
-        'ip': 'ws://0.0.0.1:2',
-        'camera': 'http://000.0000:930',
-        'linearSpeed': 0.5,
-        'angularSpeed': 1.0,
-        'samplingRate': 0.1,
-      },
-      {
-        'robType': 'B1W',
-        'ip': 'ws://0.0.0.1:2',
-        'camera': 'http://000.0000:930',
-        'linearSpeed': 0.5,
-        'angularSpeed': 1.0,
-        'samplingRate': 0.1,
-      },
-    ]);
-  }
-void selectRobot(Map<String, dynamic> robot) {
-  robotType.value = robot['robType'];
-  ipWebSocket.value.text = robot['ip'];
-  ipCamera.value.text = robot['camera'];
-  linearSpeed.value = robot['linearSpeed'];
-  angularSpeed.value = robot['angularSpeed'];
-  samplingRate.value = robot['samplingRate'];
+  // Select a robot by its map
+  void selectRobot(Map<String, dynamic> robot) {
+    final idx = profiles.indexOf(robot);
+    if (idx >= 0) {
+      selectedIndex.value = idx;
+      box.write(kSelected, idx);
+    }
 
-  storage.write('robotType', robotType.value);
-  storage.write('ip', ipWebSocket.value);
-  storage.write('camera', ipCamera.value);
-  storage.write('linearSpeed', linearSpeed.value);
-  storage.write('angularSpeed', angularSpeed.value);
-  storage.write('samplingRate', samplingRate.value);
+    robotType.value = (robot['robType'] ?? '') as String;
+    ipWebSocket.value.text = (robot['ip'] ?? '') as String;
+    ipCamera.value.text = (robot['camera'] ?? '') as String;
+    linearSpeed.value = ((robot['linearSpeed'] ?? 0.5) as num).toDouble();
+    angularSpeed.value = ((robot['angularSpeed'] ?? 1.0) as num).toDouble();
+    samplingRate.value = ((robot['samplingRate'] ?? 0.1) as num).toDouble();
 
-  disconnect.value = false;
-  connectionRos.value = 'Connected';
-}
+    // Persist last-used
+    _persistScalars();
 
-
-  void resetToDefault() {
-    ipWebSocket.value.text = 'wss://192.168.123.99:8002';
-    ipCamera.value.text = 'https://192.168.123.99:8889/d455f/';
-    robotType.value = 'G1';
-    linearSpeed.value = 0.5;
-    angularSpeed.value = 1.0;
-    samplingRate.value = 0.1;
-    applyIpRobot();
-    talker.info('resetToDefault');
+    disconnect.value = false;
+    connectionRos.value = 'Connected';
   }
 
-  void applyIpRobot() async {
-    storage.write('ip', ipWebSocket.value);
-    storage.write('camera', ipCamera.value);
-    storage.write('robotType', robotType.value);
-    storage.write('linearSpeed', linearSpeed.value);
-    storage.write('angularSpeed', angularSpeed.value);
-    storage.write('samplingRate', samplingRate.value);
-    talker.info('applyIpRobot');
+  // Save current UI fields into the currently selected profile and persist
+  void applyIpRobot() {
+    if (profiles.isEmpty) return;
+
+    final idx = selectedIndex.value.clamp(0, profiles.length - 1);
+    final p = Map<String, dynamic>.from(profiles[idx]);
+
+    p['robType'] = robotType.value;
+    p['ip'] = ipWebSocket.value.text.trim();
+    p['camera'] = ipCamera.value.text.trim();
+    p['linearSpeed'] = linearSpeed.value;
+    p['angularSpeed'] = angularSpeed.value;
+    p['samplingRate'] = samplingRate.value;
+
+    profiles[idx] = p; // update
+    profiles.refresh();
+    _persistProfiles();
+
+    // Also persist scalars for quick restore
+    _persistScalars();
+
+    // Reconnect flow if you need it
     reDisconnectAndConnect();
   }
+
+  // If you want a separate "save only" without reconnecting
+  void saveEditsFromFields() => applyIpRobot();
+
+  void resetToDefault() {
+    if (profiles.isEmpty) return;
+
+    final currentType = robotType.value;
+    final def = _defaultProfiles().firstWhere(
+      (e) => e['robType'] == currentType,
+      orElse: () => _defaultProfiles().first,
+    );
+
+    robotType.value = (def['robType'] ?? '') as String;
+    ipWebSocket.value.text = (def['ip'] ?? '') as String;
+    ipCamera.value.text = (def['camera'] ?? '') as String;
+    linearSpeed.value = ((def['linearSpeed'] ?? 0.5) as num).toDouble();
+    angularSpeed.value = ((def['angularSpeed'] ?? 1.0) as num).toDouble();
+    samplingRate.value = ((def['samplingRate'] ?? 0.1) as num).toDouble();
+
+    applyIpRobot();
+  }
+
+  // ——— Helpers ———
+
+  void _applySelectionToFields() {
+    if (profiles.isEmpty) return;
+    final p = profiles[selectedIndex.value.clamp(0, profiles.length - 1)];
+    robotType.value = (p['robType'] ?? '') as String;
+    ipWebSocket.value.text = (p['ip'] ?? '') as String;
+    ipCamera.value.text = (p['camera'] ?? '') as String;
+    linearSpeed.value = ((p['linearSpeed'] ?? 0.5) as num).toDouble();
+    angularSpeed.value = ((p['angularSpeed'] ?? 1.0) as num).toDouble();
+    samplingRate.value = ((p['samplingRate'] ?? 0.1) as num).toDouble();
+  }
+
+  void _persistProfiles() {
+    box.write(kProfiles, profiles.map((e) => Map<String, dynamic>.from(e)).toList());
+  }
+
+  void _persistScalars() {
+    box.write(kSelected, selectedIndex.value);
+    box.write(kRobotType, robotType.value);
+    box.write(kIp, ipWebSocket.value.text);
+    box.write(kCamera, ipCamera.value.text);
+    box.write(kLinear, linearSpeed.value);
+    box.write(kAngular, angularSpeed.value);
+    box.write(kSample, samplingRate.value);
+  }
+
+  void _ensureSeededProfiles() {
+    final raw = box.read<List>(kProfiles);
+    if (raw != null && raw.isNotEmpty) return;
+    box.write(kProfiles, _defaultProfiles());
+    box.write(kSelected, 0);
+  }
+
+  List<Map<String, dynamic>> _defaultProfiles() => [
+        {
+          'robType': 'G1',
+          'ip': 'ws://0.0.0.1:1',
+          'camera': 'http://000.0000:920',
+          'linearSpeed': 0.5,
+          'angularSpeed': 1.0,
+          'samplingRate': 0.1,
+        },
+        {
+          'robType': 'H1',
+          'ip': 'ws://0.0.0.1:2',
+          'camera': 'http://000.0000:930',
+          'linearSpeed': 0.5,
+          'angularSpeed': 1.0,
+          'samplingRate': 0.1,
+        },
+        {
+          'robType': 'B1',
+          'ip': 'ws://0.0.0.1:2',
+          'camera': 'http://000.0000:930',
+          'linearSpeed': 0.5,
+          'angularSpeed': 1.0,
+          'samplingRate': 0.1,
+        },
+        {
+          'robType': 'B1W',
+          'ip': 'ws://0.0.0.1:2',
+          'camera': 'http://000.0000:930',
+          'linearSpeed': 0.5,
+          'angularSpeed': 1.0,
+          'samplingRate': 0.1,
+        },
+      ];
+
 
   void reDisconnectAndConnect() async {
     talker.info('reDisconnectAndConnect');
