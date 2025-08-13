@@ -63,7 +63,7 @@ class _SidebarNavigation extends StatelessWidget {
                 selected: selectedIndex == 1,
                 onTap: () => onTap(1),
               ),
-                SizedBox(height: 12),
+              SizedBox(height: 12),
               _NavIcon(
                 icon: Icons.flag_rounded,
                 size: 20,
@@ -77,7 +77,7 @@ class _SidebarNavigation extends StatelessWidget {
                 selected: selectedIndex == 3,
                 onTap: () => onTap(3),
               ),
-               SizedBox(height: 12),
+              SizedBox(height: 12),
               _NavIcon(
                 icon: Icons.auto_fix_high_rounded,
                 size: 20,
@@ -112,8 +112,14 @@ class _BottomNavigation extends StatelessWidget {
           icon: Icon(Icons.dashboard_rounded, size: 20),
           label: '',
         ),
-        BottomNavigationBarItem(icon: Icon(Icons.gamepad_rounded, size: 20), label: ''),
-        BottomNavigationBarItem(icon: Icon(Icons.flag_rounded, size: 20), label: ''),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.gamepad_rounded, size: 20),
+          label: '',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.flag_rounded, size: 20),
+          label: '',
+        ),
         BottomNavigationBarItem(
           icon: Icon(Icons.settings_rounded, size: 20),
           label: '',
