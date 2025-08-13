@@ -47,7 +47,7 @@ class _SidebarNavigation extends StatelessWidget {
       child: Column(
         children: [
           Icon(Icons.android, color: Colors.white, size: 24),
-          SizedBox(height: 20),
+          SizedBox(height: 28),
           Column(
             children: [
               _NavIcon(
@@ -56,26 +56,33 @@ class _SidebarNavigation extends StatelessWidget {
                 selected: selectedIndex == 0,
                 onTap: () => onTap(0),
               ),
-              SizedBox(height: 10),
+              SizedBox(height: 12),
               _NavIcon(
-                icon: Icons.gamepad,
+                icon: Icons.gamepad_rounded,
                 size: 20,
                 selected: selectedIndex == 1,
                 onTap: () => onTap(1),
               ),
-              SizedBox(height: 10),
+                SizedBox(height: 12),
               _NavIcon(
-                icon: Icons.flag,
+                icon: Icons.flag_rounded,
                 size: 20,
                 selected: selectedIndex == 2,
                 onTap: () => onTap(2),
               ),
-              SizedBox(height: 10),
+              SizedBox(height: 12),
               _NavIcon(
-                icon: Icons.settings,
+                icon: Icons.settings_rounded,
                 size: 20,
                 selected: selectedIndex == 3,
                 onTap: () => onTap(3),
+              ),
+               SizedBox(height: 12),
+              _NavIcon(
+                icon: Icons.auto_fix_high_rounded,
+                size: 20,
+                selected: selectedIndex == 4,
+                onTap: () => onTap(4),
               ),
             ],
           ),
@@ -102,13 +109,17 @@ class _BottomNavigation extends StatelessWidget {
       onTap: onTap,
       items: const [
         BottomNavigationBarItem(
-          icon: Icon(Icons.dashboard, size: 20),
+          icon: Icon(Icons.dashboard_rounded, size: 20),
           label: '',
         ),
-        BottomNavigationBarItem(icon: Icon(Icons.gamepad, size: 20), label: ''),
-        BottomNavigationBarItem(icon: Icon(Icons.flag, size: 20), label: ''),
+        BottomNavigationBarItem(icon: Icon(Icons.gamepad_rounded, size: 20), label: ''),
+        BottomNavigationBarItem(icon: Icon(Icons.flag_rounded, size: 20), label: ''),
         BottomNavigationBarItem(
-          icon: Icon(Icons.settings, size: 20),
+          icon: Icon(Icons.settings_rounded, size: 20),
+          label: '',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.auto_fix_high_rounded, size: 20),
           label: '',
         ),
       ],
@@ -135,22 +146,24 @@ class _FloatingNavigation extends StatelessWidget {
         return Center(
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 300),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             decoration: BoxDecoration(
               color: AppColors.scaffold,
-              borderRadius: BorderRadius.circular(isExpanded ? 32 : 24),
+              borderRadius: BorderRadius.circular(28),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 if (isExpanded) ...[
-                  _navButton(0, Icons.dashboard),
+                  _navButton(0, Icons.dashboard_rounded),
                   _spacer(),
-                  _navButton(1, Icons.gamepad),
+                  _navButton(1, Icons.gamepad_rounded),
                   _spacer(),
-                  _navButton(2, Icons.flag),
+                  _navButton(2, Icons.flag_rounded),
                   _spacer(),
-                  _navButton(3, Icons.settings),
+                  _navButton(3, Icons.settings_rounded),
+                  _spacer(),
+                  _navButton(4, Icons.auto_fix_high_rounded),
                   _spacer(),
                   _toggleButton(isExpanded),
                 ] else ...[
@@ -170,15 +183,15 @@ class _FloatingNavigation extends StatelessWidget {
     return GestureDetector(
       onTap: () => isExpandedNotifier.value = !isExpanded,
       child: Container(
-        width: 28,
-        height: 28,
+        width: 32,
+        height: 32,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: AppColors.scaffold,
+          color: AppColors.card,
         ),
         child: Icon(
-          isExpanded ? Icons.close : Icons.more_horiz,
-          size: 14,
+          isExpanded ? Icons.close : Icons.expand_more,
+          size: 20,
           color: Colors.white70,
         ),
       ),
@@ -194,13 +207,13 @@ class _FloatingNavigation extends StatelessWidget {
         onTap(index);
       },
       child: Container(
-        width: 24,
+        width: 48,
         height: 24,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: Colors.transparent,
         ),
-        child: Icon(icon, color: color, size: 18),
+        child: Icon(icon, color: color, size: 20),
       ),
     );
   }
@@ -217,6 +230,8 @@ class _FloatingNavigation extends StatelessWidget {
         return Icons.flag;
       case 3:
         return Icons.settings;
+      case 4:
+        return Icons.auto_fix_high_rounded;
       default:
         return Icons.help_outline;
     }
@@ -272,6 +287,9 @@ Widget buildResponsiveNavBar(BuildContext context) {
         case 3:
           Get.offAllNamed('/setting');
           break;
+        case 4:
+          Get.offAllNamed('/service');
+          break;
       }
     },
     floatingNavExpanded: floatingNavExpanded,
@@ -301,6 +319,8 @@ int getNavIndexByRoute(String route) {
       return 2;
     case '/setting':
       return 3;
+    case '/service':
+      return 4;
     default:
       return 0;
   }

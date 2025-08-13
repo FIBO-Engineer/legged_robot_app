@@ -125,13 +125,17 @@ class DashboardScreen extends StatelessWidget {
       children: [
         ElevatedButton(
           style: ElevatedButton.styleFrom(
+            minimumSize: const Size(0, 56),
             backgroundColor: AppColors.card,
             foregroundColor: AppColors.red,
           ),
           onPressed: () {},
-          child: Text("EMG", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+          child: Text(
+            "EMG",
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+          ),
         ),
-        const SizedBox(width: 10),
+        const SizedBox(width: 12),
         CircleButton(
           icon: Icons.workspaces_rounded,
           backgroundColor: AppColors.card,
@@ -233,7 +237,7 @@ class DashboardScreen extends StatelessWidget {
 
   Widget _verticalDivider() {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal:8),
+      margin: const EdgeInsets.symmetric(horizontal: 8),
       width: 1,
       height: 18,
       color: AppColors.grey,

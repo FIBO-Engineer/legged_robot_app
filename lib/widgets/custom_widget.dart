@@ -15,8 +15,8 @@ class CircleButton extends StatelessWidget {
     required this.icon,
     this.backgroundColor = AppColors.card,
     this.iconColor = Colors.white,
-    this.size = 32,
-    this.iconSize = 18,
+    this.size = 46,
+    this.iconSize = 20,
     required this.onPressed,
   });
 

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import '../controllers/main_conroller.dart';
-import '../units/app_colors.dart' show AppColors;
-import '../units/app_constants.dart' show ScreenSize;
+import '../units/app_colors.dart';
+import '../units/app_constants.dart';
 import '../widgets/app_navigation_bar.dart';
 
 class SettingPage extends StatelessWidget {
@@ -56,16 +56,16 @@ class SettingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screen = ScreenSize(context);
-    final c = Get.find<MainController>();
     final theme = Theme.of(context);
+    MainController c = Get.find();
 
     return SingleChildScrollView(
-      padding: EdgeInsets.all(16),
+      padding: EdgeInsets.all(12),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           _profileWidget(c, theme),
+
           const SizedBox(height: 16),
           _deviceWidget(c, theme, screen),
           const SizedBox(height: 16),
@@ -100,37 +100,38 @@ class SettingScreen extends StatelessWidget {
         child: Wrap(
           spacing: 6,
           runSpacing: 6,
-          children:
-              items.map((profile) {
-                final robType = profile['robType'] as String? ?? '';
-                final isSelected = robType == current;
-                return TextButton.icon(
-                  onPressed:
-                      () => c.selectRobot(Map<String, dynamic>.from(profile)),
-                  icon: Icon(
-                    Icons.person,
-                    color: isSelected ? AppColors.primary : AppColors.kNavColor,
-                    size: 16,
-                  ),
-                  label: Text(
-                    robType,
-                    style: TextStyle(
-                      color:
-                          isSelected ? AppColors.primary : AppColors.kNavColor,
-                      fontSize: 12,
-                    ),
-                  ),
-                  style: TextButton.styleFrom(
-                    backgroundColor:
-                        isSelected ? AppColors.scaffold : Colors.transparent,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    minimumSize: const Size(0, 36),
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                  ),
-                );
-              }).toList(),
+          children: List.generate(items.length, (i) {
+            final profile = items[i];
+            final robType = profile['robType'] as String? ?? '';
+            final isSelected = robType == current;
+
+            return TextButton.icon(
+              onPressed: () => c.selectRobotByIndex(i),
+              icon: Icon(
+                robType == 'G1' || robType == 'H1'
+                    ? Icons.person
+                    : Icons.pets_rounded,
+                color: isSelected ? Colors.white : AppColors.kNavColor,
+                size: 16,
+              ),
+              label: Text(
+                robType,
+                style: TextStyle(
+                  color: isSelected ? Colors.white : AppColors.kNavColor,
+                  fontSize: 12,
+                ),
+              ),
+              style: TextButton.styleFrom(
+                backgroundColor:
+                    isSelected ? AppColors.primary : Colors.transparent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                minimumSize: const Size(0, 46),
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+              ),
+            );
+          }),
         ),
       );
     });
@@ -141,38 +142,58 @@ class SettingScreen extends StatelessWidget {
     ThemeData theme,
     ScreenSize screen,
   ) {
-    final ipFormatter = [
+    final inputFormatter = [
       FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z0-9:./_-]')),
     ];
 
     final portrait = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(
-          height: 40,
-          child: TextField(
-            controller: controller.ipWebSocket.value,
-            decoration: const InputDecoration(labelText: "Address"),
-            inputFormatters: ipFormatter,
-          ),
+        TextField(
+          controller: controller.ipWebSocket.value,
+          decoration: const InputDecoration(labelText: "Address"),
+          inputFormatters: inputFormatter,
+        ),
+
+        const SizedBox(height: 12),
+        TextField(
+          controller: controller.ipCamera.value,
+          decoration: const InputDecoration(labelText: "Camera"),
+          inputFormatters: inputFormatter,
         ),
         const SizedBox(height: 12),
-        SizedBox(
-          height: 40,
-          child: TextField(
-            controller: controller.ipCamera.value,
-            decoration: const InputDecoration(labelText: "Camera"),
-            inputFormatters: ipFormatter,
+        ElevatedButton.icon(
+          icon: Icon(
+            !controller.disconnect.value
+                ? Icons.link_off_rounded
+                : Icons.link_rounded,
+            color:
+                !controller.disconnect.value
+                    ? AppColors.red
+                    : AppColors.primary,
+            size: 22,
           ),
-        ),
-        const SizedBox(height: 12),
-        ElevatedButton(
-          onPressed: () => controller.applyIpRobot(),
           style: ElevatedButton.styleFrom(
-            minimumSize: const Size(double.infinity, 46),
-            backgroundColor: Colors.blue,
+            minimumSize: const Size(double.infinity, 56),
+            backgroundColor: AppColors.card,
+            foregroundColor: Colors.white,
           ),
-          child: Text('Connect', style: theme.textTheme.labelMedium),
+          onPressed: () {
+            if (controller.disconnect.value) {
+              controller.connectRobot();
+            } else {
+              controller.disconnectRobot();
+            }
+          },
+          label: Text(
+            controller.disconnect.value ? 'Connect' : 'Disconnect',
+            style: TextStyle(
+              color:
+                  !controller.disconnect.value
+                      ? AppColors.red
+                      : AppColors.primary,
+            ),
+          ),
         ),
       ],
     );
@@ -180,34 +201,53 @@ class SettingScreen extends StatelessWidget {
     final landscape = Row(
       children: [
         Expanded(
-          child: SizedBox(
-            height: 40,
-            child: TextField(
-              controller: controller.ipWebSocket.value,
-              decoration: const InputDecoration(labelText: "Address"),
-              inputFormatters: ipFormatter,
-            ),
+          child: TextField(
+            controller: controller.ipWebSocket.value,
+            decoration: const InputDecoration(labelText: "Address"),
+            inputFormatters: inputFormatter,
           ),
         ),
         const SizedBox(width: 12),
         Expanded(
-          child: SizedBox(
-            height: 40,
-            child: TextField(
-              controller: controller.ipCamera.value,
-              decoration: const InputDecoration(labelText: "Camera"),
-              inputFormatters: ipFormatter,
-            ),
+          child: TextField(
+            controller: controller.ipCamera.value,
+            decoration: const InputDecoration(labelText: "Camera"),
+            inputFormatters: inputFormatter,
           ),
         ),
         const SizedBox(width: 12),
-        ElevatedButton(
-          onPressed: () => controller.applyIpRobot(),
-          style: ElevatedButton.styleFrom(
-            minimumSize: const Size(120, 46),
-            backgroundColor: Colors.blue,
+        ElevatedButton.icon(
+          icon: Icon(
+            !controller.disconnect.value
+                ? Icons.link_off_rounded
+                : Icons.link_rounded,
+            color:
+                !controller.disconnect.value
+                    ? AppColors.red
+                    : AppColors.primary,
+            size: 22,
           ),
-          child: Text('Connect', style: theme.textTheme.labelMedium),
+          style: ElevatedButton.styleFrom(
+            minimumSize: const Size(0, 56),
+            backgroundColor: AppColors.card,
+            foregroundColor: Colors.white,
+          ),
+          onPressed: () {
+            if (controller.disconnect.value) {
+              controller.connectRobot();
+            } else {
+              controller.disconnectRobot();
+            }
+          },
+          label: Text(
+            controller.disconnect.value ? 'Connect' : 'Disconnect',
+            style: TextStyle(
+              color:
+                  !controller.disconnect.value
+                      ? AppColors.red
+                      : AppColors.primary,
+            ),
+          ),
         ),
       ],
     );
@@ -216,7 +256,7 @@ class SettingScreen extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('Device', style: theme.textTheme.titleMedium),
-        const SizedBox(height: 8),
+        const SizedBox(height: 12),
         screen.isPortrait ? portrait : landscape,
       ],
     );
@@ -231,9 +271,9 @@ class SettingScreen extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _sliderTile('Linear Speed', controller.linearSpeed),
-        const SizedBox(height: 8),
+        const SizedBox(height: 12),
         _sliderTile('Angular Speed', controller.angularSpeed),
-        const SizedBox(height: 8),
+        const SizedBox(height: 12),
         _sliderTile('Sampling Rate', controller.samplingRate),
       ],
     );
@@ -267,8 +307,22 @@ class SettingScreen extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('Motion Control', style: theme.textTheme.titleMedium),
-        const SizedBox(height: 8),
+        const SizedBox(height: 12),
         screen.isPortrait ? compact : wide,
+        const SizedBox(height: 12),
+        Align(
+          alignment: Alignment.centerRight,
+          child: ElevatedButton.icon(
+            icon: Icon(Icons.save_rounded, color: AppColors.green, size: 20),
+            style: ElevatedButton.styleFrom(
+              minimumSize: Size(screen.isPortrait ? double.infinity : 0, 56),
+              backgroundColor: AppColors.card,
+              foregroundColor: AppColors.green,
+            ),
+            label: Text('Save', style: TextStyle(color: AppColors.green)),
+            onPressed: () => controller.applyIpRobot(),
+          ),
+        ),
       ],
     );
   }
@@ -277,7 +331,7 @@ class SettingScreen extends StatelessWidget {
     final theme = Theme.of(Get.context!);
     return Obx(
       () => Container(
-        padding: const EdgeInsets.all(8),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: AppColors.card,
           borderRadius: BorderRadius.circular(12),
