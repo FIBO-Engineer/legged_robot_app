@@ -7,6 +7,7 @@ import '../widgets/app_navigation_bar.dart';
 import '../widgets/camera/camera_view.dart';
 import '../widgets/controls/movement_joystick.dart';
 import '../widgets/controls/rotation_joystick.dart';
+import '../widgets/custom_widget.dart';
 
 class TeleoperatedPage extends StatelessWidget {
   const TeleoperatedPage({super.key});
@@ -54,77 +55,107 @@ class TeleoperatedScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screen = ScreenSize(context);
+    final c = Get.find<MainController>();
 
-    if (screen.isDesktop || screen.isTablet) {
-      return Stack(
-        children: [
-          Positioned.fill(child: CameraView()),
-          Positioned(
-            left: 50,
-            bottom: 50,
-            child: MovementJoystick(controller: controller),
-          ),
-          Positioned(
-            right: 50,
-            bottom: 50,
-            child: RotationJoystick(controller: controller),
-          ),
-        ],
-      );
-    } else if (screen.isPortrait) {
-      return Column(
-        children: [
-          Expanded(
-            child: Stack(
-              children: [
-                Positioned.fill(child: CameraView()),
-                Positioned(
-                  left: 20,
-                  bottom: 20,
-                  child: MovementJoystick(
-                    controller: controller,
-                   sizeJoy: 140,
-                    sizeBall: 25,
-                  ),
+    return Obx(() {
+      final showJoy = c.showJoy.value;
+
+      if (screen.isDesktop || screen.isTablet) {
+        return Stack(
+          children: [
+            const Positioned.fill(child: CameraView()),
+            Positioned(top: 10, right: 10, child: _controlWidget()),
+            if (showJoy) ...[
+              Positioned(
+                left: 50,
+                bottom: 50,
+                child: MovementJoystick(controller: c),
+              ),
+              Positioned(
+                right: 50,
+                bottom: 50,
+                child: RotationJoystick(controller: c),
+              ),
+            ],
+          ],
+        );
+      } else if (screen.isPortrait) {
+        return Column(
+          children: [
+            Expanded(
+              child: Stack(
+                children: [
+                  const Positioned.fill(child: CameraView()),
+                  Positioned(top: 10, right: 10, child: _controlWidget()),
+
+                  if (showJoy) ...[
+                    Positioned(
+                      left: 20,
+                      bottom: 20,
+                      child: MovementJoystick(
+                        controller: c,
+                        sizeJoy: 140,
+                        sizeBall: 25,
+                      ),
+                    ),
+                    Positioned(
+                      right: 20,
+                      bottom: 20,
+                      child: RotationJoystick(
+                        controller: c,
+                        sizeJoy: 140,
+                        sizeBall: 25,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        );
+      } else {
+        return Stack(
+          children: [
+            const Positioned.fill(child: CameraView()),
+            Positioned(top: 10, right: 10, child: _controlWidget()),
+            if (showJoy) ...[
+              Positioned(
+                left: 20,
+                bottom: 10,
+                child: MovementJoystick(
+                  controller: c,
+                  sizeJoy: 150,
+                  sizeBall: 30,
                 ),
-                Positioned(
-                  right: 20,
-                  bottom: 20,
-                  child: RotationJoystick(
-                    controller: controller,
-                    sizeJoy: 140,
-                    sizeBall: 25,
-                  ),
+              ),
+              Positioned(
+                right: 20,
+                bottom: 10,
+                child: RotationJoystick(
+                  controller: c,
+                  sizeJoy: 150,
+                  sizeBall: 30,
                 ),
-              ],
-            ),
-          ),
-        ],
-      );
-    } else {
-      return Stack(
-        children: [
-          Positioned.fill(child: CameraView()),
-          Positioned(
-            left: 20,
-            bottom: 10,
-            child: MovementJoystick(
-              controller: controller,
-              sizeJoy: 150,
-              sizeBall: 30,
-            ),
-          ),
-          Positioned(
-            right: 20,
-            bottom: 10,
-            child: RotationJoystick(
-              controller: controller,
-              sizeJoy: 150,
-              sizeBall: 30,
-            ),
-          ),
-        ],
-      );
-    }
+              ),
+            ],
+          ],
+        );
+      }
+    });
+  }
+
+  Widget _controlWidget() {
+    MainController controller = Get.find();
+    return Obx(
+      () => CircleButton(
+        icon: Icons.gamepad_rounded,
+        backgroundColor: AppColors.scaffold,
+        iconColor:
+            controller.showJoy.value ? AppColors.primary : Colors.white,
+        onPressed: () {
+          controller.showJoy.value = !controller.showJoy.value;
+        },
+      ),
+    );
   }
 }

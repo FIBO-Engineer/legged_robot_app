@@ -18,31 +18,31 @@ TextTheme textTheme() {
     bodySmall: TextStyle(
       fontSize: 14,
       fontWeight: FontWeight.normal,
-      color: AppColors.kNavColor,
+      color: AppColors.grey,
       overflow: TextOverflow.ellipsis,
     ),
     titleLarge: TextStyle(
-      fontSize: 16,
+      fontSize: 18,
       fontWeight: FontWeight.w500,
       color: Colors.white,
       overflow: TextOverflow.ellipsis,
     ),
     titleMedium: TextStyle(
-      fontSize: 14,
+      fontSize: 16,
       fontWeight: FontWeight.w400,
       color: Colors.white,
       overflow: TextOverflow.ellipsis,
     ),
     titleSmall: TextStyle(
-      fontSize: 12,
+      fontSize: 14,
       fontWeight: FontWeight.w400,
-      color: AppColors.kNavColor,
+      color: AppColors.grey,
       overflow: TextOverflow.ellipsis,
     ),
     labelLarge: TextStyle(
       fontSize: 16,
       fontWeight: FontWeight.w600,
-      color: AppColors.kNavColor,
+      color: AppColors.grey,
       overflow: TextOverflow.ellipsis,
     ),
     labelMedium: TextStyle(
@@ -54,7 +54,7 @@ TextTheme textTheme() {
     labelSmall: TextStyle(
       fontSize: 12,
       fontWeight: FontWeight.w400,
-      color: AppColors.kNavColor,
+      color: AppColors.grey,
       overflow: TextOverflow.ellipsis,
     ),
   );
@@ -64,9 +64,6 @@ InputDecorationTheme inputDecorationTheme() {
   const borderRadius = BorderRadius.all(Radius.circular(12));
 
   return InputDecorationTheme(
-     constraints: const BoxConstraints(
-      minHeight: 40,
-    ),
     border: const OutlineInputBorder(
       borderRadius: borderRadius,
       borderSide: BorderSide.none,
@@ -89,29 +86,29 @@ InputDecorationTheme inputDecorationTheme() {
     ),
     filled: true,
     alignLabelWithHint: true,
-    fillColor: AppColors.card,
-    prefixIconColor: AppColors.kNavColor,
-    suffixIconColor: AppColors.kNavColor,
-    helperStyle: const TextStyle(color: AppColors.kNavColor,    fontSize: 14,),
-    errorStyle: const TextStyle(color: AppColors.red,    fontSize: 14,),
+    fillColor: AppColors.scaffold,
+    prefixIconColor: AppColors.grey,
+    suffixIconColor: AppColors.grey,
+    helperStyle: const TextStyle(color: AppColors.grey, fontSize: 14),
+    errorStyle: const TextStyle(color: AppColors.red, fontSize: 14),
     labelStyle: const TextStyle(
-      color: AppColors.kNavColor,
-     fontSize: 14,
+      color: AppColors.grey,
+      fontSize: 14,
       fontWeight: FontWeight.normal,
     ),
     hintStyle: const TextStyle(
-      color: AppColors.kNavColor,
+      color: AppColors.grey,
       fontSize: 14,
       fontWeight: FontWeight.normal,
     ),
     prefixStyle: const TextStyle(
       color: Colors.white,
-       fontSize: 14,
+      fontSize: 14,
       fontWeight: FontWeight.normal,
     ),
     floatingLabelStyle: const TextStyle(
-      color: AppColors.kNavColor,
-     fontSize: 14,
+      color: AppColors.grey,
+      fontSize: 14,
       fontWeight: FontWeight.normal,
     ),
   );

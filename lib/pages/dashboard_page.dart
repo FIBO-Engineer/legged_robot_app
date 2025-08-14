@@ -106,12 +106,7 @@ class DashboardScreen extends StatelessWidget {
 
   Widget _mapWidget() {
     return Container(
-      // padding: const EdgeInsets.all(12),
-      // margin: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppColors.background,
-        // borderRadius: BorderRadius.circular(12),
-      ),
+      decoration: BoxDecoration(color: AppColors.background),
       alignment: Alignment.center,
       child: const Text(
         'MAP',
@@ -126,19 +121,19 @@ class DashboardScreen extends StatelessWidget {
         ElevatedButton(
           style: ElevatedButton.styleFrom(
             minimumSize: const Size(0, 56),
-            backgroundColor: AppColors.card,
+            backgroundColor: AppColors.scaffold,
             foregroundColor: AppColors.red,
           ),
           onPressed: () {},
           child: Text(
             "EMG",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
           ),
         ),
         const SizedBox(width: 12),
         CircleButton(
           icon: Icons.workspaces_rounded,
-          backgroundColor: AppColors.card,
+          backgroundColor: AppColors.scaffold,
           iconColor: Colors.white,
           onPressed: () {},
         ),

@@ -27,7 +27,7 @@ class RotationJoystick extends StatelessWidget {
           size: sizeJoy,
           mode: JoystickMode.horizontal,
           decoration: JoystickBaseDecoration(
-            color: AppColors.card.withValues(alpha: 100),
+            color: AppColors.card.withValues(alpha: 0.1),
             drawOuterCircle: false,
           ),
           arrowsDecoration: JoystickArrowsDecoration(

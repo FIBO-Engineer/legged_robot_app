@@ -6,6 +6,7 @@ class CircleButton extends StatelessWidget {
   final IconData icon;
   final Color backgroundColor;
   final Color iconColor;
+  final Color borderColor;
   final double size;
   final double iconSize;
   final VoidCallback onPressed;
@@ -15,6 +16,7 @@ class CircleButton extends StatelessWidget {
     required this.icon,
     this.backgroundColor = AppColors.card,
     this.iconColor = Colors.white,
+    this.borderColor = Colors.transparent,
     this.size = 46,
     this.iconSize = 20,
     required this.onPressed,
@@ -26,8 +28,9 @@ class CircleButton extends StatelessWidget {
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: backgroundColor,
-        shape: BoxShape.circle,
+        color: AppColors.scaffold,
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: borderColor, width: 1.2),
       ),
       child: IconButton(
         icon: Icon(icon, color: iconColor, size: iconSize),

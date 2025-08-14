@@ -149,9 +149,16 @@ class _FloatingNavigation extends StatelessWidget {
     return ValueListenableBuilder<bool>(
       valueListenable: isExpandedNotifier,
       builder: (context, isExpanded, _) {
-        return Center(
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
+        return InkWell(
+          borderRadius: BorderRadius.circular(20),
+          hoverColor: AppColors.background,
+          focusColor: AppColors.background,
+          splashColor: AppColors.background,
+          highlightColor: AppColors.background,
+          onLongPress: () {
+            isExpandedNotifier.value = !isExpanded;
+          },
+          child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             decoration: BoxDecoration(
               color: AppColors.scaffold,
@@ -170,37 +177,14 @@ class _FloatingNavigation extends StatelessWidget {
                   _navButton(3, Icons.settings_rounded),
                   _spacer(),
                   _navButton(4, Icons.auto_fix_high_rounded),
-                  _spacer(),
-                  _toggleButton(isExpanded),
                 ] else ...[
                   _navButton(selectedIndex, _iconForIndex(selectedIndex)),
-                  _spacer(),
-                  _toggleButton(isExpanded),
                 ],
               ],
             ),
           ),
         );
       },
-    );
-  }
-
-  Widget _toggleButton(bool isExpanded) {
-    return GestureDetector(
-      onTap: () => isExpandedNotifier.value = !isExpanded,
-      child: Container(
-        width: 32,
-        height: 32,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: AppColors.card,
-        ),
-        child: Icon(
-          isExpanded ? Icons.close : Icons.expand_more,
-          size: 20,
-          color: Colors.white70,
-        ),
-      ),
     );
   }
 
@@ -213,8 +197,8 @@ class _FloatingNavigation extends StatelessWidget {
         onTap(index);
       },
       child: Container(
-        width: 48,
-        height: 24,
+        width: 28,
+        height: 28,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: Colors.transparent,
@@ -224,7 +208,7 @@ class _FloatingNavigation extends StatelessWidget {
     );
   }
 
-  Widget _spacer() => const SizedBox(width: 12);
+  Widget _spacer() => const SizedBox(width: 28);
 
   IconData _iconForIndex(int index) {
     switch (index) {

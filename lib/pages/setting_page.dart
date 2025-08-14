@@ -65,10 +65,9 @@ class SettingScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           _profileWidget(c, theme),
-
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           _deviceWidget(c, theme, screen),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           _motionControlWidget(c, theme, screen),
         ],
       ),
@@ -84,7 +83,7 @@ class SettingScreen extends StatelessWidget {
         return Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: AppColors.card,
+            color: AppColors.scaffold,
             borderRadius: BorderRadius.circular(28),
           ),
           child: Text('No profiles', style: theme.textTheme.bodySmall),
@@ -94,7 +93,7 @@ class SettingScreen extends StatelessWidget {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
         decoration: BoxDecoration(
-          color: AppColors.card,
+          color: AppColors.scaffold,
           borderRadius: BorderRadius.circular(28),
         ),
         child: Wrap(
@@ -111,13 +110,13 @@ class SettingScreen extends StatelessWidget {
                 robType == 'G1' || robType == 'H1'
                     ? Icons.person
                     : Icons.pets_rounded,
-                color: isSelected ? Colors.white : AppColors.kNavColor,
-                size: 16,
+                color: isSelected ? Colors.white : AppColors.grey,
+               
               ),
               label: Text(
                 robType,
                 style: TextStyle(
-                  color: isSelected ? Colors.white : AppColors.kNavColor,
+                  color: isSelected ? Colors.white : AppColors.grey,
                   fontSize: 12,
                 ),
               ),
@@ -171,11 +170,10 @@ class SettingScreen extends StatelessWidget {
                 !controller.disconnect.value
                     ? AppColors.red
                     : AppColors.primary,
-            size: 22,
           ),
           style: ElevatedButton.styleFrom(
             minimumSize: const Size(double.infinity, 56),
-            backgroundColor: AppColors.card,
+            backgroundColor: AppColors.scaffold,
             foregroundColor: Colors.white,
           ),
           onPressed: () {
@@ -191,7 +189,7 @@ class SettingScreen extends StatelessWidget {
               color:
                   !controller.disconnect.value
                       ? AppColors.red
-                      : AppColors.primary,
+                      : AppColors.primary,fontWeight: FontWeight.w500
             ),
           ),
         ),
@@ -229,7 +227,7 @@ class SettingScreen extends StatelessWidget {
           ),
           style: ElevatedButton.styleFrom(
             minimumSize: const Size(0, 56),
-            backgroundColor: AppColors.card,
+            backgroundColor: AppColors.scaffold,
             foregroundColor: Colors.white,
           ),
           onPressed: () {
@@ -313,13 +311,13 @@ class SettingScreen extends StatelessWidget {
         Align(
           alignment: Alignment.centerRight,
           child: ElevatedButton.icon(
-            icon: Icon(Icons.save_rounded, color: AppColors.green, size: 20),
+            icon: Icon(Icons.save_rounded, color: AppColors.green),
             style: ElevatedButton.styleFrom(
               minimumSize: Size(screen.isPortrait ? double.infinity : 0, 56),
-              backgroundColor: AppColors.card,
+              backgroundColor: AppColors.scaffold,
               foregroundColor: AppColors.green,
             ),
-            label: Text('Save', style: TextStyle(color: AppColors.green)),
+            label: Text('Save', style: TextStyle(color: AppColors.green, fontWeight: FontWeight.w500)),
             onPressed: () => controller.applyIpRobot(),
           ),
         ),
@@ -333,7 +331,7 @@ class SettingScreen extends StatelessWidget {
       () => Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: AppColors.card,
+          color: AppColors.scaffold,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(

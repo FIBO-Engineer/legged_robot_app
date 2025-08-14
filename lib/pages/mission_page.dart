@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../units/app_colors.dart';
 import '../units/app_constants.dart';
 import '../widgets/app_navigation_bar.dart';
 
@@ -11,7 +12,7 @@ class MissionPage extends StatelessWidget {
 
     if (screen.isDesktop || screen.isTablet) {
       return Scaffold(
-        backgroundColor: Colors.black,
+        backgroundColor: AppColors.background,
         body: Row(
           children: [
             buildResponsiveNavBar(context),
@@ -28,7 +29,7 @@ class MissionPage extends StatelessWidget {
       );
     } else {
       return Scaffold(
-        backgroundColor: Colors.black,
+        backgroundColor: AppColors.background,
         body: Stack(
           children: [
             Center(

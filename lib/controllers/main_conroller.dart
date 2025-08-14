@@ -13,9 +13,9 @@ class MainController extends GetxController {
   Timer? _heartbeatTimer;
   RxBool disconnect = true.obs;
   RxString connectionRos = 'Disconnected'.obs;
-
+  RxBool showJoy = true.obs;
   /*------------------------------ Setting --------------------------------------*/
-  final box = GetStorage('app');
+  final box = GetStorage('Storage');
   final profiles = <Map<String, dynamic>>[].obs;
   final Rx<TextEditingController> ipWebSocket =
       TextEditingController(text: '').obs; //'wss://192.168.123.99:8002'
@@ -72,7 +72,6 @@ class MainController extends GetxController {
   ];
 
   /*------------------------------ Services --------------------------------------*/
-  GetStorage boxService = GetStorage('Storage');
   RxList<TextEditingController> textControllerArgs =
       [TextEditingController()].obs;
   RxList<TextEditingController> textControllerData =
@@ -86,7 +85,7 @@ class MainController extends GetxController {
   RxBool editCard = false.obs;
   RxBool isPublish = false.obs;
   RxMap cardData = {}.obs;
-  final RxList<String> topics = <String>['Publish', 'CallService'].obs;
+  final RxList<String> topics = <String>['Publish', 'Call Service'].obs;
   RxList<dynamic> cards = <dynamic>[].obs;
   RxList<dynamic> resetCards =
       <dynamic>[
@@ -119,12 +118,13 @@ class MainController extends GetxController {
   @override
   void onInit() async {
     super.onInit();
+    await GetStorage.init('Storage');
     await GetStorage.init('app');
     try {
-      if (boxService.read('cards') == null) {
-        boxService.write('cards', <dynamic>[]);
+      if (box.read('cards') == null) {
+        box.write('cards', <dynamic>[]);
       } else {
-        cards.value = boxService.read('cards');
+        cards.value = box.read('cards');
       }
 
       initProfile();
@@ -264,7 +264,7 @@ class MainController extends GetxController {
 
   /// Save cards to persistent storage.
   void syncToStorage() {
-    boxService.write('cards', cards);
+    box.write('cards', cards);
     talker.info('syncToStorage $cards');
   }
 

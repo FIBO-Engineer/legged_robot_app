@@ -28,7 +28,7 @@ class MovementJoystick extends StatelessWidget {
           size: sizeJoy,
           mode: JoystickMode.all,
           decoration: JoystickBaseDecoration(
-            color: AppColors.card.withValues(alpha: 100),
+            color:  AppColors.card.withValues(alpha: 0.1),
             drawOuterCircle: false,
           ),
           arrowsDecoration: JoystickArrowsDecoration(

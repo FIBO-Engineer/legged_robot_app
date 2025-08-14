@@ -21,12 +21,12 @@ class CameraView extends StatelessWidget {
         width: width ?? double.infinity,
         height: height ?? 300,
         decoration: BoxDecoration(
-          color: AppColors.card,
+          color: AppColors.scaffold,
           borderRadius: BorderRadius.circular(borderRadius),
         ),
         child: Stack(
           children: [
-            if (c.isLoading.value) Center(child: CircularProgressIndicator()),
+            if (c.isLoading.value) Center(child: CircularProgressIndicator(color: Colors.white),),
 
             if (!c.isLoading.value && c.errorMessage.isNotEmpty)
               Center(
@@ -43,8 +43,6 @@ class CameraView extends StatelessWidget {
                     ),
                     SizedBox(height: 16),
                     CircleButton(
-                      size: 40,
-                      iconSize: 20,
                       icon: Icons.refresh_rounded,
                       backgroundColor: AppColors.background,
                       iconColor: Colors.white,

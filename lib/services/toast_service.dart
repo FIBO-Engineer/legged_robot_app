@@ -39,7 +39,7 @@ class ToastService {
       autoCloseDuration: duration,
       backgroundColor: AppColors.card,
       foregroundColor: Colors.white,
-      borderSide: BorderSide(color: AppColors.kNavColor, width: 0.8),
+      borderSide: BorderSide(color: AppColors.grey, width: 0.8),
       title: Text(
         title,
         style: TextStyle(color: accent, fontWeight: FontWeight.bold),
