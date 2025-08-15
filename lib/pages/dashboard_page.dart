@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:legged_robot_app/units/app_colors.dart';
+import '../controllers/main_conroller.dart';
 import '../units/app_constants.dart';
 import '../widgets/app_navigation_bar.dart';
 import '../widgets/camera/camera_view.dart';
 import '../widgets/custom_widget.dart';
+import '../widgets/display/display_grid.dart';
 
 class DashboardPage extends StatelessWidget {
   const DashboardPage({super.key});
@@ -49,134 +52,379 @@ class DashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    MainController controller = Get.find();
     final screen = ScreenSize(context);
 
-    if (screen.isDesktop || screen.isTablet) {
-      return Stack(
-        children: [
-          Positioned.fill(child: _mapWidget()),
-          Positioned(
-            top: 10,
-            right: 10,
-            child: CameraView(
-              width: screen.width * 0.3,
-              height: screen.width * 0.3 * 9 / 16,
-              borderRadius: 8,
-            ),
-          ),
-          Positioned(top: 10, left: 10, child: _statusWidget(context)),
-          Positioned(bottom: 10, right: 10, child: _controlWidget()),
-        ],
-      );
-    } else if (screen.isPortrait) {
-      return Column(
-        children: [
-          AspectRatio(aspectRatio: 16 / 9, child: CameraView()),
+    return Obx(() {
+      final showCamera = controller.showCamera.value;
 
-          Expanded(
+      if (screen.isDesktop || screen.isTablet) {
+        return Stack(
+          children: [
+            Positioned.fill(child: _mapWidget()),
+            if (showCamera)
+              Positioned(
+                top: 10,
+                right: 10,
+                child: CameraView(
+                  width: screen.width * 0.3,
+                  height: screen.width * 0.3 * 9 / 16,
+                  borderRadius: 8,
+                ),
+              ),
+
+            Positioned(top: 10, left: 10, child: _statusWidget(context)),
+            Positioned(top: 46, left: 6, child: _controlWidget(controller)),
+            Positioned(bottom: 10, left: 10, child: _emgWidget()),
+            Positioned(bottom: 10, right: 10, child: _zoomWidget()),
+          ],
+        );
+      } else if (screen.isPortrait) {
+        return Column(
+          children: [
+            if (showCamera)
+              AspectRatio(aspectRatio: 16 / 9, child: CameraView()),
+
+            Expanded(
+              child: Stack(
+                children: [
+                  Positioned.fill(child: _mapWidget()),
+                  Positioned(top: 10, left: 10, child: _statusWidget(context)),
+                  Positioned(
+                    top: 46,
+                    left: 6,
+                    child: _controlWidget(controller),
+                  ),
+                  Positioned(bottom: 10, left: 10, child: _emgWidget()),
+                  Positioned(bottom: 10, right: 10, child: _zoomWidget()),
+                ],
+              ),
+            ),
+          ],
+        );
+      } else {
+        return Stack(
+          children: [
+            Positioned.fill(child: _mapWidget()),
+            if (showCamera)
+              Positioned(
+                top: 10,
+                right: 10,
+                child: CameraView(
+                  width: screen.width * 0.35,
+                  height: screen.width * 0.35 * 9 / 16,
+                  borderRadius: 8,
+                ),
+              ),
+            Positioned(top: 10, left: 10, child: _statusWidget(context)),
+            Positioned(top: 46, left: 6, child: _controlWidget(controller)),
+            Positioned(bottom: 10, left: 10, child: _emgWidget()),
+            Positioned(bottom: 10, right: 10, child: _zoomWidget()),
+          ],
+        );
+      }
+    });
+  }
+
+  // Widget _mapWidget() {
+  //   return Container(
+  //     decoration: BoxDecoration(color: AppColors.background),
+  //     alignment: Alignment.center,
+  //     child: const Text(
+  //       'MAP',
+  //       style: TextStyle(color: Colors.white, fontSize: 28),
+  //     ),
+  //   );
+  // }
+
+  Widget _mapWidget() {
+    final c = Get.find<MainController>();
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // stepPixels = 1m = 1/resolution (ก่อนซูม)
+        final stepPixels = (1.0 / c.mapResolution.value);
+
+        return InteractiveViewer(
+          key: c.mapAreaKey,
+          transformationController: c.mapTC,
+          minScale: c.mapMinScale,
+          maxScale: c.mapMaxScale,
+          constrained: true, // ขยายเต็มกล่อง
+          child: SizedBox(
+            width: constraints.maxWidth,
+            height: constraints.maxHeight,
             child: Stack(
               children: [
-                Positioned.fill(child: _mapWidget()),
-                Positioned(top: 10, left: 10, child: _statusWidget(context)),
-                Positioned(bottom: 10, right: 10, child: _controlWidget()),
+                // กริดเต็มฉาก (จะถูกซูม/แพนไปพร้อมเนื้อหา)
+                Positioned.fill(
+                  child: DisplayGrid(
+                    step: stepPixels, // 1 ช่อง = 1 เมตร (ก่อนซูม)
+                    width: constraints.maxWidth,
+                    height: constraints.maxHeight,
+                  ),
+                ),
+
+                // // ไอคอนหุ่น (คำนวณพิกเซลจากเมตร)
+                // Obx(() {
+                //   final pxX = c.robotMeters.value.dx * c.pxPerMeter;
+                //   final pxY = c.robotMeters.value.dy * c.pxPerMeter;
+                //   const robotSize = 24.0;
+
+                //   return Positioned(
+                //     left: pxX - robotSize / 2,
+                //     top:  pxY - robotSize / 2,
+                //     child: Transform.rotate(
+                //       angle: c.robotYaw.value,      // เรเดียน
+                //       child: DisplayRobot(
+                //         size: robotSize,
+                //         color: Colors.blue,
+                //         direction: 0,               // ถ้าตัว widget รับทิศเพิ่ม ให้กรอกที่นี่
+                //       ),
+                //     ),
+                //   );
+                // }),
               ],
             ),
           ),
-        ],
-      );
-    } else {
-      return Stack(
-        children: [
-          Positioned.fill(child: _mapWidget()),
-          Positioned(
-            top: 10,
-            right: 10,
-            child: CameraView(
-              width: screen.width * 0.35,
-              height: screen.width * 0.35 * 9 / 16,
-              borderRadius: 8,
-            ),
-          ),
-          Positioned(top: 10, left: 10, child: _statusWidget(context)),
-          Positioned(bottom: 10, right: 10, child: _controlWidget()),
-        ],
-      );
-    }
-  }
-
-  Widget _mapWidget() {
-    return Container(
-      decoration: BoxDecoration(color: AppColors.background),
-      alignment: Alignment.center,
-      child: const Text(
-        'MAP',
-        style: TextStyle(color: Colors.white, fontSize: 28),
-      ),
+        );
+      },
     );
   }
 
-  Widget _controlWidget() {
-    return Row(
+Widget _zoomWidget() {
+  final c = Get.find<MainController>();
+  return Column(
+    children: [
+      IconButton(
+        icon: const Icon(Icons.zoom_in_rounded, size: 24, color: AppColors.grey),
+        onPressed: () => c.zoomBy(1.2),
+      ),
+      IconButton(
+        icon: const Icon(Icons.zoom_out_rounded, size: 24, color: AppColors.grey),
+        onPressed: () => c.zoomBy(1 / 1.2),
+      ),
+      Obx(() => IconButton(
+            icon: Icon(
+              Icons.location_searching,
+              size: 20,
+              color: c.followRobot.value ? AppColors.primary : AppColors.grey,
+            ),
+            onPressed: c.toggleFollow,    // กด = toggle on/off
+            onLongPress: c.recenterOnRobot, // กดค้าง = จัดกลางครั้งเดียว
+          )),
+    ],
+  );
+}
+  Widget _emgWidget() {
+    return TextButton.icon(
+      icon: Icon(Icons.block_rounded, color: Colors.white, size: 20),
+      label: Text(
+        'Emergency',
+        style: TextStyle(
+          fontSize: 14,
+          color: Colors.white,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      style: ElevatedButton.styleFrom(
+        elevation: 2,
+        minimumSize: const Size(0, 46),
+        backgroundColor: AppColors.red,
+        foregroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      onPressed: () {},
+    );
+  }
+
+  Widget _controlWidget(MainController controller) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            minimumSize: const Size(0, 56),
-            backgroundColor: AppColors.scaffold,
-            foregroundColor: AppColors.red,
+        // Layer Control Card
+        Card(
+          elevation: 2,
+          color: AppColors.card,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
           ),
-          onPressed: () {},
-          child: Text(
-            "EMG",
-            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Obx(
+                  () => IconButton(
+                    hoverColor: AppColors.card,
+                    icon: Icon(Icons.layers_rounded, size: 20),
+                    color:
+                        controller.showLayer.value
+                            ? AppColors.primary
+                            : AppColors.grey,
+                    onPressed: controller.toggleLayer,
+                    tooltip: '', //Layer control
+                  ),
+                ),
+
+                Obx(
+                  () =>
+                      controller.showLayer.value
+                          ? Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // Global Costmap
+                              Obx(
+                                () => IconButton(
+                                  hoverColor: AppColors.card,
+                                  icon: Icon(Icons.map, size: 20),
+                                  color:
+                                      controller.showGlobalCostmap.value
+                                          ? AppColors.primary
+                                          : AppColors.grey,
+                                  onPressed: controller.toggleGlobalCostmap,
+                                  tooltip: '', //Global map
+                                ),
+                              ),
+
+                              // Local Costmap
+                              Obx(
+                                () => IconButton(
+                                  hoverColor: AppColors.card,
+                                  icon: Icon(Icons.map_outlined, size: 20),
+                                  color:
+                                      controller.showLocalCostmap.value
+                                          ? AppColors.primary
+                                          : AppColors.grey,
+                                  onPressed: controller.toggleLocalCostmap,
+                                  tooltip: '', //Local map
+                                ),
+                              ),
+
+                              // Laser
+                              Obx(
+                                () => IconButton(
+                                  hoverColor: AppColors.card,
+                                  icon: Icon(Icons.radar_rounded, size: 20),
+                                  color:
+                                      controller.showLaser.value
+                                          ? AppColors.primary
+                                          : AppColors.grey,
+                                  onPressed: controller.toggleLaser,
+                                  tooltip: '', //Laser
+                                ),
+                              ),
+
+                              // Point Cloud
+                              Obx(
+                                () => IconButton(
+                                  hoverColor: AppColors.card,
+                                  icon: Icon(Icons.cloud, size: 20),
+                                  color:
+                                      controller.showPointCloud.value
+                                          ? AppColors.primary
+                                          : AppColors.grey,
+                                  onPressed: controller.togglePointCloud,
+                                  tooltip: '', //Point cloud
+                                ),
+                              ),
+                            ],
+                          )
+                          : SizedBox.shrink(),
+                ),
+              ],
+            ),
           ),
         ),
-        const SizedBox(width: 12),
-        CircleButton(
-          icon: Icons.workspaces_rounded,
-          backgroundColor: AppColors.scaffold,
-          iconColor: Colors.white,
-          onPressed: () {},
+        //Relocation
+        Card(
+          elevation: 2,
+          color: AppColors.card,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Obx(
+                  () => IconButton(
+                    hoverColor: AppColors.card,
+                    icon: Icon(Icons.explore_rounded, size: 20),
+                    color:
+                        controller.showRelocation.value
+                            ? AppColors.primary
+                            : AppColors.grey,
+                    onPressed: controller.toggleRelocation,
+                    tooltip: '',
+                  ),
+                ),
+                Obx(
+                  () =>
+                      controller.showRelocation.value
+                          ? Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                hoverColor: AppColors.card,
+                                icon: Icon(Icons.clear_rounded, size: 20),
+                                color: AppColors.red,
+                                onPressed: () {},
+                                tooltip: '',
+                              ),
+                              IconButton(
+                                hoverColor: AppColors.card,
+                                icon: Icon(Icons.check_rounded, size: 20),
+                                color: AppColors.green,
+                                onPressed: () {},
+                                tooltip: '',
+                              ),
+                            ],
+                          )
+                          : SizedBox.shrink(),
+                ),
+              ],
+            ),
+          ),
+        ),
+
+        Obx(
+          () => CircleButton(
+            tooltip: '', //Camera control
+            borderRadius: 12,
+            icon: Icons.camera_alt,
+            backgroundColor: AppColors.card,
+            iconColor:
+                controller.showCamera.value
+                    ? AppColors.primary
+                    : AppColors.grey,
+            onPressed: controller.toggleCamera,
+          ),
         ),
       ],
     );
   }
 
   Widget _statusWidget(BuildContext context) {
-    final screen = ScreenSize(context);
-    double boxWidth =
-        screen.isDesktop
-            ? 180
-            : screen.isPortrait
-            ? 120
-            : 110;
-    final double fontSize = (boxWidth / 10).clamp(9, 14);
-
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         _infoGroupBox(
           children: [
-            _infoItem(
-              icon: Icons.link_off,
-              text: 'Disconnect',
-              fontSize: fontSize,
-            ),
+            _infoItem(icon: Icons.link_off, text: 'Disconnect'),
             _verticalDivider(),
-            _infoItem(
-              icon: Icons.battery_std,
-              text: '50 %',
-              fontSize: fontSize,
-            ),
+            _infoItem(icon: Icons.battery_std, text: '50', unit: '%'),
           ],
         ),
         const SizedBox(width: 10),
         _infoGroupBox(
           children: [
-            _infoItem(text: '10.00, 2.48', unit: 'm', fontSize: fontSize),
+            _infoItem(text: '10.00, 2.48', unit: 'm'),
             _verticalDivider(),
-            _infoItem(text: '90.25', unit: 'deg', fontSize: fontSize),
+            _infoItem(text: '90.25', unit: 'deg'),
             _verticalDivider(),
-            _infoItem(text: '1.05', unit: 'm/s', fontSize: fontSize),
+            _infoItem(text: '1.05', unit: 'm/s'),
           ],
         ),
       ],
@@ -194,25 +442,19 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _infoItem({
-    IconData? icon,
-    required String text,
-    String? unit,
-    required double fontSize,
-  }) {
+  Widget _infoItem({required String text, IconData? icon, String? unit}) {
     return Row(
       children: [
         if (icon != null) ...[
-          Icon(icon, color: Colors.white, size: fontSize * 1.2),
+          Icon(icon, color: Colors.white, size: 18),
           const SizedBox(width: 4),
         ],
         Text(
           text,
           style: TextStyle(
             color: Colors.white,
-            fontSize: fontSize,
-            fontWeight: FontWeight.bold,
-            fontFamily: 'monospace',
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
           ),
         ),
         if (unit != null && unit.isNotEmpty) ...[
@@ -221,7 +463,7 @@ class DashboardScreen extends StatelessWidget {
             unit,
             style: TextStyle(
               color: AppColors.grey,
-              fontSize: fontSize * 0.85,
+              fontSize: 12,
               fontWeight: FontWeight.w500,
             ),
           ),

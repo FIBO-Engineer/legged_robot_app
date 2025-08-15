@@ -80,12 +80,19 @@ class ServiceScreen extends StatelessWidget {
                     icon: Icon(Icons.add_rounded, color: Colors.white),
                     label: Text(
                       'New Service',
-                      style: theme.textTheme.titleMedium,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                      ),
                     ),
                     style: ElevatedButton.styleFrom(
+                      elevation: 2,
                       minimumSize: const Size(0, 46),
                       backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                     onPressed: () {
                       c.clearTextController();
@@ -136,6 +143,7 @@ class ServiceScreen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 14,
                       color: isSelected ? Colors.white : AppColors.grey,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                   style: TextButton.styleFrom(
@@ -178,14 +186,15 @@ class ServiceScreen extends StatelessWidget {
               ),
               label: const Text(
                 "Default",
-                style: TextStyle(fontWeight: FontWeight.w500),
+                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
               ),
               style: TextButton.styleFrom(
-                backgroundColor: AppColors.scaffold,
+                elevation: 2,
+                backgroundColor: AppColors.card,
                 foregroundColor: AppColors.grey,
                 minimumSize: const Size(0, 46),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(28),
+                  borderRadius: BorderRadius.circular(12),
                   side: BorderSide(color: AppColors.grey, width: 1.2),
                 ),
               ),
@@ -329,12 +338,16 @@ class ServiceScreen extends StatelessWidget {
                 icon: const Icon(Icons.clear_rounded, color: AppColors.grey),
                 label: const Text(
                   "Cancel",
-                  style: TextStyle(fontWeight: FontWeight.w500),
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
                 ),
                 style: TextButton.styleFrom(
-                  backgroundColor: AppColors.scaffold,
+                  elevation: 2,
+                  backgroundColor: AppColors.card,
                   foregroundColor: AppColors.grey,
-                  minimumSize: const Size(double.infinity, 56),
+                  minimumSize: const Size(double.infinity, 54),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
                 onPressed: () {
                   c.addCard.value = false;
@@ -352,12 +365,19 @@ class ServiceScreen extends StatelessWidget {
                 ),
                 label: Text(
                   isEdit ? 'Update' : 'Save',
-                  style: const TextStyle(fontWeight: FontWeight.w500),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
                 ),
                 style: TextButton.styleFrom(
-                  backgroundColor: AppColors.scaffold,
+                  elevation: 2,
+                  backgroundColor: AppColors.card,
                   foregroundColor: isEdit ? AppColors.orange : AppColors.green,
-                  minimumSize: const Size(double.infinity, 56),
+                  minimumSize: const Size(double.infinity, 54),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
                 onPressed: () {
                   if (c.labelTextField.value.text.isEmpty ||
@@ -560,7 +580,7 @@ class ServiceScreen extends StatelessWidget {
                             });
                           },
                         ),
-                        SizedBox(width: 8),
+                        SizedBox(width: 4),
                         CircleButton(
                           size: 36,
                           iconSize: 18,

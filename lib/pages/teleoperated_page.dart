@@ -50,12 +50,11 @@ class TeleoperatedPage extends StatelessWidget {
 //---------------------- Teleoperated Content Responsive ---------------------//
 class TeleoperatedScreen extends StatelessWidget {
   const TeleoperatedScreen({super.key});
-  static final MainController controller = Get.find();
 
   @override
   Widget build(BuildContext context) {
     final screen = ScreenSize(context);
-    final c = Get.find<MainController>();
+    final MainController c = Get.find();
 
     return Obx(() {
       final showJoy = c.showJoy.value;
@@ -148,13 +147,11 @@ class TeleoperatedScreen extends StatelessWidget {
     MainController controller = Get.find();
     return Obx(
       () => CircleButton(
+        borderRadius: 12,
         icon: Icons.gamepad_rounded,
-        backgroundColor: AppColors.scaffold,
-        iconColor:
-            controller.showJoy.value ? AppColors.primary : Colors.white,
-        onPressed: () {
-          controller.showJoy.value = !controller.showJoy.value;
-        },
+        backgroundColor: AppColors.card,
+        iconColor: controller.showJoy.value ? AppColors.primary : Colors.white,
+        onPressed: controller.toggleJoy,
       ),
     );
   }

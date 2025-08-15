@@ -111,13 +111,13 @@ class SettingScreen extends StatelessWidget {
                     ? Icons.person
                     : Icons.pets_rounded,
                 color: isSelected ? Colors.white : AppColors.grey,
-               
               ),
               label: Text(
                 robType,
                 style: TextStyle(
+                  fontSize: 14,
                   color: isSelected ? Colors.white : AppColors.grey,
-                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
               style: TextButton.styleFrom(
@@ -172,9 +172,13 @@ class SettingScreen extends StatelessWidget {
                     : AppColors.primary,
           ),
           style: ElevatedButton.styleFrom(
-            minimumSize: const Size(double.infinity, 56),
-            backgroundColor: AppColors.scaffold,
+            elevation: 2,
+            minimumSize: const Size(double.infinity, 54),
+            backgroundColor: AppColors.card,
             foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
           ),
           onPressed: () {
             if (controller.disconnect.value) {
@@ -189,7 +193,9 @@ class SettingScreen extends StatelessWidget {
               color:
                   !controller.disconnect.value
                       ? AppColors.red
-                      : AppColors.primary,fontWeight: FontWeight.w500
+                      : AppColors.primary,
+              fontWeight: FontWeight.w600,
+              fontSize: 14,
             ),
           ),
         ),
@@ -226,9 +232,13 @@ class SettingScreen extends StatelessWidget {
             size: 22,
           ),
           style: ElevatedButton.styleFrom(
-            minimumSize: const Size(0, 56),
-            backgroundColor: AppColors.scaffold,
+            elevation: 2,
+            minimumSize: const Size(0, 54),
+            backgroundColor: AppColors.card,
             foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
           ),
           onPressed: () {
             if (controller.disconnect.value) {
@@ -244,6 +254,8 @@ class SettingScreen extends StatelessWidget {
                   !controller.disconnect.value
                       ? AppColors.red
                       : AppColors.primary,
+              fontWeight: FontWeight.w600,
+              fontSize: 14,
             ),
           ),
         ),
@@ -313,11 +325,18 @@ class SettingScreen extends StatelessWidget {
           child: ElevatedButton.icon(
             icon: Icon(Icons.save_rounded, color: AppColors.green),
             style: ElevatedButton.styleFrom(
-              minimumSize: Size(screen.isPortrait ? double.infinity : 0, 56),
-              backgroundColor: AppColors.scaffold,
+              elevation: 2,
+              minimumSize: Size(screen.isPortrait ? double.infinity : 0, 54),
+              backgroundColor: AppColors.card,
               foregroundColor: AppColors.green,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
-            label: Text('Save', style: TextStyle(color: AppColors.green, fontWeight: FontWeight.w500)),
+            label: Text(
+              'Save',
+              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+            ),
             onPressed: () => controller.applyIpRobot(),
           ),
         ),

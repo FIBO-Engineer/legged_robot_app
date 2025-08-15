@@ -13,7 +13,7 @@ class MainController extends GetxController {
   Timer? _heartbeatTimer;
   RxBool disconnect = true.obs;
   RxString connectionRos = 'Disconnected'.obs;
-  RxBool showJoy = true.obs;
+
   /*------------------------------ Setting --------------------------------------*/
   final box = GetStorage('Storage');
   final profiles = <Map<String, dynamic>>[].obs;
@@ -115,9 +115,133 @@ class MainController extends GetxController {
         },
       ].obs;
 
+  // Observable variables
+  RxBool showLayer = false.obs;
+  var showGlobalCostmap = false.obs;
+  var showLocalCostmap = false.obs;
+  var showLaser = false.obs;
+  var showPointCloud = false.obs;
+  RxBool showRelocation = false.obs;
+  RxBool showCamera = true.obs;
+  RxBool showJoy = true.obs;
+
+  // Toggle methods
+  void toggleLayer() {
+    showLayer.value = !showLayer.value;
+  }
+
+  void toggleGlobalCostmap() {
+    showGlobalCostmap.value = !showGlobalCostmap.value;
+  }
+
+  void toggleLocalCostmap() {
+    showLocalCostmap.value = !showLocalCostmap.value;
+  }
+
+  void toggleLaser() {
+    showLaser.value = !showLaser.value;
+  }
+
+  void togglePointCloud() {
+    showPointCloud.value = !showPointCloud.value;
+  }
+
+  void toggleRelocation() {
+    showRelocation.value = !showRelocation.value;
+  }
+
+  void toggleCamera() {
+    showCamera.value = !showCamera.value;
+  }
+
+  void toggleJoy() {
+    showJoy.value = !showJoy.value;
+  }
+
+  // --- world <-> screen ---
+  RxDouble mapResolution = 0.05.obs; // m/pixel
+  double get pxPerMeter => 1.0 / mapResolution.value;
+
+  // odom (เมตร / เรเดียน)
+  Rx<Offset> robotMeters = Offset.zero.obs;
+  RxDouble robotYaw = 0.0.obs;
+
+  // --- zoom/pan state ---
+  final TransformationController mapTC = TransformationController();
+  final GlobalKey mapAreaKey = GlobalKey();
+  final double mapMinScale = 0.4;
+  final double mapMaxScale = 10.0;
+
+  // --- โหมดติดตามหุ่น ---
+  RxBool followRobot = false.obs; // <— toggle on/off
+
+  void toggleFollow() {
+    followRobot.value = !followRobot.value;
+    if (followRobot.value) {
+      // เปิดโหมดปุ๊บ จับให้อยู่กลางทันที
+      recenterOnRobot();
+    }
+  }
+
+  // ซูมด้วย factor (คุม scale ให้อยู่ในช่วง)
+  void zoomBy(double factor) {
+    final ctx = mapAreaKey.currentContext;
+    final box = ctx?.findRenderObject() as RenderBox?;
+    if (box == null) return;
+    final center = box.size.center(Offset.zero);
+
+    final current = mapTC.value.getMaxScaleOnAxis();
+    final target = (current * factor).clamp(mapMinScale, mapMaxScale);
+    final safeFactor = target / current;
+
+    final m =
+        Matrix4.copy(mapTC.value)
+          ..translate(center.dx, center.dy)
+          ..scale(safeFactor)
+          ..translate(-center.dx, -center.dy);
+    mapTC.value = m;
+
+    // กำลัง follow อยู่? ซูมเสร็จจับไว้กลางต่อ
+    if (followRobot.value) recenterOnRobot();
+  }
+
+  // จับหุ่นไว้กลางจอ (รักษา scale เดิม)
+  void recenterOnRobot() {
+    final ctx = mapAreaKey.currentContext;
+    final box = ctx?.findRenderObject() as RenderBox?;
+    if (box == null) return;
+
+    final center = box.size.center(Offset.zero);
+    final scale = mapTC.value.getMaxScaleOnAxis();
+
+    final px = Offset(
+      robotMeters.value.dx * pxPerMeter,
+      robotMeters.value.dy * pxPerMeter,
+    );
+
+    mapTC.value =
+        Matrix4.identity()
+          ..translate(center.dx, center.dy)
+          ..scale(scale)
+          ..translate(-px.dx, -px.dy);
+  }
+
+  // เรียกทุกครั้งที่ได้ /odom
+  void updateOdom({required double x, required double y, required double yaw}) {
+    robotMeters.value = Offset(x, y);
+    robotYaw.value = yaw;
+    if (followRobot.value) {
+      // โหมดติดตาม: อัปเดตเมทริกซ์ให้หุ่นอยู่กลางเสมอ
+      recenterOnRobot();
+    }
+  }
+
   @override
   void onInit() async {
     super.onInit();
+    ever(robotMeters, (_) {
+      if (followRobot.value) recenterOnRobot();
+    });
     await GetStorage.init('Storage');
     await GetStorage.init('app');
     try {
