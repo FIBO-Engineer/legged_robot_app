@@ -54,10 +54,10 @@ class TeleoperatedScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screen = ScreenSize(context);
-    final MainController c = Get.find();
+    final MainController controller = Get.find();
 
     return Obx(() {
-      final showJoy = c.showJoy.value;
+      final showJoy = controller.showJoy.value;
 
       if (screen.isDesktop || screen.isTablet) {
         return Stack(
@@ -68,12 +68,12 @@ class TeleoperatedScreen extends StatelessWidget {
               Positioned(
                 left: 50,
                 bottom: 50,
-                child: MovementJoystick(controller: c),
+                child: MovementJoystick(controller: controller),
               ),
               Positioned(
                 right: 50,
                 bottom: 50,
-                child: RotationJoystick(controller: c),
+                child: RotationJoystick(controller: controller),
               ),
             ],
           ],
@@ -92,7 +92,7 @@ class TeleoperatedScreen extends StatelessWidget {
                       left: 20,
                       bottom: 20,
                       child: MovementJoystick(
-                        controller: c,
+                        controller: controller,
                         sizeJoy: 140,
                         sizeBall: 25,
                       ),
@@ -101,7 +101,7 @@ class TeleoperatedScreen extends StatelessWidget {
                       right: 20,
                       bottom: 20,
                       child: RotationJoystick(
-                        controller: c,
+                        controller: controller,
                         sizeJoy: 140,
                         sizeBall: 25,
                       ),
@@ -122,7 +122,7 @@ class TeleoperatedScreen extends StatelessWidget {
                 left: 20,
                 bottom: 10,
                 child: MovementJoystick(
-                  controller: c,
+                  controller: controller,
                   sizeJoy: 150,
                   sizeBall: 30,
                 ),
@@ -131,7 +131,7 @@ class TeleoperatedScreen extends StatelessWidget {
                 right: 20,
                 bottom: 10,
                 child: RotationJoystick(
-                  controller: c,
+                  controller: controller,
                   sizeJoy: 150,
                   sizeBall: 30,
                 ),

@@ -52,8 +52,8 @@ class DashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    MainController controller = Get.find();
     final screen = ScreenSize(context);
+    final MainController controller = Get.find();
 
     return Obx(() {
       final showCamera = controller.showCamera.value;
@@ -126,23 +126,11 @@ class DashboardScreen extends StatelessWidget {
     });
   }
 
-  // Widget _mapWidget() {
-  //   return Container(
-  //     decoration: BoxDecoration(color: AppColors.background),
-  //     alignment: Alignment.center,
-  //     child: const Text(
-  //       'MAP',
-  //       style: TextStyle(color: Colors.white, fontSize: 28),
-  //     ),
-  //   );
-  // }
-
   Widget _mapWidget() {
     final c = Get.find<MainController>();
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        // stepPixels = 1m = 1/resolution (ก่อนซูม)
         final stepPixels = (1.0 / c.mapResolution.value);
 
         return InteractiveViewer(
@@ -150,16 +138,15 @@ class DashboardScreen extends StatelessWidget {
           transformationController: c.mapTC,
           minScale: c.mapMinScale,
           maxScale: c.mapMaxScale,
-          constrained: true, // ขยายเต็มกล่อง
+          constrained: true,
           child: SizedBox(
             width: constraints.maxWidth,
             height: constraints.maxHeight,
             child: Stack(
               children: [
-                // กริดเต็มฉาก (จะถูกซูม/แพนไปพร้อมเนื้อหา)
                 Positioned.fill(
                   child: DisplayGrid(
-                    step: stepPixels, // 1 ช่อง = 1 เมตร (ก่อนซูม)
+                    step: stepPixels,
                     width: constraints.maxWidth,
                     height: constraints.maxHeight,
                   ),
@@ -175,11 +162,11 @@ class DashboardScreen extends StatelessWidget {
                 //     left: pxX - robotSize / 2,
                 //     top:  pxY - robotSize / 2,
                 //     child: Transform.rotate(
-                //       angle: c.robotYaw.value,      // เรเดียน
+                //       angle: c.robotYaw.value,
                 //       child: DisplayRobot(
                 //         size: robotSize,
                 //         color: Colors.blue,
-                //         direction: 0,               // ถ้าตัว widget รับทิศเพิ่ม ให้กรอกที่นี่
+                //         direction: 0,
                 //       ),
                 //     ),
                 //   );
@@ -192,48 +179,44 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-Widget _zoomWidget() {
-  final c = Get.find<MainController>();
-  return Column(
-    children: [
-      IconButton(
-        icon: const Icon(Icons.zoom_in_rounded, size: 24, color: AppColors.grey),
-        onPressed: () => c.zoomBy(1.2),
-      ),
-      IconButton(
-        icon: const Icon(Icons.zoom_out_rounded, size: 24, color: AppColors.grey),
-        onPressed: () => c.zoomBy(1 / 1.2),
-      ),
-      Obx(() => IconButton(
+  Widget _zoomWidget() {
+    final c = Get.find<MainController>();
+    return Column(
+      children: [
+        IconButton(
+          icon: const Icon(Icons.add_rounded, size: 24, color: AppColors.grey),
+          onPressed: () => c.zoomBy(1.2),
+        ),
+        IconButton(
+          icon: const Icon(
+            Icons.remove_rounded,
+            size: 24,
+            color: AppColors.grey,
+          ),
+          onPressed: () => c.zoomBy(1 / 1.2),
+        ),
+        Obx(
+          () => IconButton(
             icon: Icon(
-              Icons.location_searching,
+              Icons.location_searching_rounded,
               size: 20,
               color: c.followRobot.value ? AppColors.primary : AppColors.grey,
             ),
-            onPressed: c.toggleFollow,    // กด = toggle on/off
-            onLongPress: c.recenterOnRobot, // กดค้าง = จัดกลางครั้งเดียว
-          )),
-    ],
-  );
-}
-  Widget _emgWidget() {
-    return TextButton.icon(
-      icon: Icon(Icons.block_rounded, color: Colors.white, size: 20),
-      label: Text(
-        'Emergency',
-        style: TextStyle(
-          fontSize: 14,
-          color: Colors.white,
-          fontWeight: FontWeight.w500,
+            onPressed: () {
+              // c.zoomBy(0);
+              // c.toggleFollow();
+            },
+          ),
         ),
-      ),
-      style: ElevatedButton.styleFrom(
-        elevation: 2,
-        minimumSize: const Size(0, 46),
-        backgroundColor: AppColors.red,
-        foregroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
+      ],
+    );
+  }
+
+  Widget _emgWidget() {
+    return CustomButton(
+      text: 'Emergency',
+      icon: Icons.block_rounded,
+      foregroundColor: AppColors.red,
       onPressed: () {},
     );
   }

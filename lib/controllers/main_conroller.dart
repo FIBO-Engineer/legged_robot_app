@@ -6,114 +6,34 @@ import 'package:get_storage/get_storage.dart';
 import 'package:legged_robot_app/services/toast_service.dart';
 import 'package:toastification/toastification.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+import '../models/robot_profile.dart';
 import '../services/talker_service.dart';
 
 class MainController extends GetxController {
   WebSocketChannel? channel;
   Timer? _heartbeatTimer;
-  RxBool disconnect = true.obs;
   RxString connectionRos = 'Disconnected'.obs;
+  RxBool disconnect = true.obs;
 
   /*------------------------------ Setting --------------------------------------*/
-  final box = GetStorage('Storage');
-  final profiles = <Map<String, dynamic>>[].obs;
-  final Rx<TextEditingController> ipWebSocket =
-      TextEditingController(text: '').obs; //'wss://192.168.123.99:8002'
-  final Rx<TextEditingController> ipCamera =
-      TextEditingController(text: '').obs; //https://192.168.123.99:8889/d455f/
-  final RxString robotType = ''.obs;
+  final box = GetStorage('setting');
+  final profiles = <Profile>[].obs;
   final selectedIndex = 0.obs;
+
+  final Rx<TextEditingController> ipWebSocket =
+      TextEditingController(text: '').obs;
+  final Rx<TextEditingController> ipCamera =
+      TextEditingController(text: '').obs;
+
+  final RxString robotType = ''.obs;
   final RxDouble samplingRate = 0.0.obs;
   final RxDouble angularSpeed = 0.0.obs;
   final RxDouble linearSpeed = 0.0.obs;
 
-  static const kProfiles = 'profiles';
-  static const kSelected = 'selectedIndex';
-  static const kRobotType = 'robotType';
-  static const kIp = 'ip';
-  static const kCamera = 'camera';
-  static const kLinear = 'linearSpeed';
-  static const kAngular = 'angularSpeed';
-  static const kSample = 'samplingRate';
-
-  List<Map<String, dynamic>> _defaultProfiles() => [
-    {
-      'robType': 'G1',
-      'ip': 'ws://0.0.0.1:1',
-      'camera': 'http://000.0000:920',
-      'linearSpeed': 0.5,
-      'angularSpeed': 1.0,
-      'samplingRate': 0.1,
-    },
-    {
-      'robType': 'H1',
-      'ip': 'ws://0.0.0.1:2',
-      'camera': 'http://000.0000:930',
-      'linearSpeed': 0.2,
-      'angularSpeed': 1.0,
-      'samplingRate': 0.1,
-    },
-    {
-      'robType': 'B1',
-      'ip': 'ws://0.0.0.1:3',
-      'camera': 'http://000.0000:930',
-      'linearSpeed': 0.3,
-      'angularSpeed': 1.0,
-      'samplingRate': 0.1,
-    },
-    {
-      'robType': 'B1W',
-      'ip': 'ws://0.0.0.1:4',
-      'camera': 'http://000.0000:930',
-      'linearSpeed': 0.4,
-      'angularSpeed': 1.0,
-      'samplingRate': 0.1,
-    },
-  ];
-
-  /*------------------------------ Services --------------------------------------*/
-  RxList<TextEditingController> textControllerArgs =
-      [TextEditingController()].obs;
-  RxList<TextEditingController> textControllerData =
-      [TextEditingController()].obs;
-  Rx<TextEditingController> serviceTextField = TextEditingController().obs;
-  Rx<TextEditingController> labelTextField = TextEditingController().obs;
-  RxInt args = 1.obs;
-  RxInt data = 1.obs;
-  final RxInt editIndex = (-1).obs;
-  RxBool addCard = false.obs;
-  RxBool editCard = false.obs;
-  RxBool isPublish = false.obs;
-  RxMap cardData = {}.obs;
-  final RxList<String> topics = <String>['Publish', 'Call Service'].obs;
-  RxList<dynamic> cards = <dynamic>[].obs;
-  RxList<dynamic> resetCards =
-      <dynamic>[
-        {
-          "args": {"data": false},
-          "label": "Stop Playing",
-          "service": "/media_player/stop",
-          "isPublish": false,
-        },
-        {
-          "args": {"data": true},
-          "label": "invite right",
-          "service": "/dynamixel_operator/z_invite_r",
-          "isPublish": false,
-        },
-        {
-          "args": {"filename": "im yours.mp3", "override": "true"},
-          "label": "im_yours",
-          "service": "/play",
-          "isPublish": "false",
-        },
-        {
-          "args": {"text": "hello", "override": "true"},
-          "label": "speak hello",
-          "service": "/speak",
-          "isPublish": "false",
-        },
-      ].obs;
+  Profile get current =>
+      profiles.isEmpty
+          ? defaultProfiles().first
+          : profiles[selectedIndex.value];
 
   // Observable variables
   RxBool showLayer = false.obs;
@@ -125,283 +45,15 @@ class MainController extends GetxController {
   RxBool showCamera = true.obs;
   RxBool showJoy = true.obs;
 
-  // Toggle methods
-  void toggleLayer() {
-    showLayer.value = !showLayer.value;
-  }
-
-  void toggleGlobalCostmap() {
-    showGlobalCostmap.value = !showGlobalCostmap.value;
-  }
-
-  void toggleLocalCostmap() {
-    showLocalCostmap.value = !showLocalCostmap.value;
-  }
-
-  void toggleLaser() {
-    showLaser.value = !showLaser.value;
-  }
-
-  void togglePointCloud() {
-    showPointCloud.value = !showPointCloud.value;
-  }
-
-  void toggleRelocation() {
-    showRelocation.value = !showRelocation.value;
-  }
-
-  void toggleCamera() {
-    showCamera.value = !showCamera.value;
-  }
-
-  void toggleJoy() {
-    showJoy.value = !showJoy.value;
-  }
-
-  // --- world <-> screen ---
-  RxDouble mapResolution = 0.05.obs; // m/pixel
-  double get pxPerMeter => 1.0 / mapResolution.value;
-
-  // odom (เมตร / เรเดียน)
-  Rx<Offset> robotMeters = Offset.zero.obs;
-  RxDouble robotYaw = 0.0.obs;
-
-  // --- zoom/pan state ---
-  final TransformationController mapTC = TransformationController();
-  final GlobalKey mapAreaKey = GlobalKey();
-  final double mapMinScale = 0.4;
-  final double mapMaxScale = 10.0;
-
-  // --- โหมดติดตามหุ่น ---
-  RxBool followRobot = false.obs; // <— toggle on/off
-
-  void toggleFollow() {
-    followRobot.value = !followRobot.value;
-    if (followRobot.value) {
-      // เปิดโหมดปุ๊บ จับให้อยู่กลางทันที
-      recenterOnRobot();
-    }
-  }
-
-  // ซูมด้วย factor (คุม scale ให้อยู่ในช่วง)
-  void zoomBy(double factor) {
-    final ctx = mapAreaKey.currentContext;
-    final box = ctx?.findRenderObject() as RenderBox?;
-    if (box == null) return;
-    final center = box.size.center(Offset.zero);
-
-    final current = mapTC.value.getMaxScaleOnAxis();
-    final target = (current * factor).clamp(mapMinScale, mapMaxScale);
-    final safeFactor = target / current;
-
-    final m =
-        Matrix4.copy(mapTC.value)
-          ..translate(center.dx, center.dy)
-          ..scale(safeFactor)
-          ..translate(-center.dx, -center.dy);
-    mapTC.value = m;
-
-    // กำลัง follow อยู่? ซูมเสร็จจับไว้กลางต่อ
-    if (followRobot.value) recenterOnRobot();
-  }
-
-  // จับหุ่นไว้กลางจอ (รักษา scale เดิม)
-  void recenterOnRobot() {
-    final ctx = mapAreaKey.currentContext;
-    final box = ctx?.findRenderObject() as RenderBox?;
-    if (box == null) return;
-
-    final center = box.size.center(Offset.zero);
-    final scale = mapTC.value.getMaxScaleOnAxis();
-
-    final px = Offset(
-      robotMeters.value.dx * pxPerMeter,
-      robotMeters.value.dy * pxPerMeter,
-    );
-
-    mapTC.value =
-        Matrix4.identity()
-          ..translate(center.dx, center.dy)
-          ..scale(scale)
-          ..translate(-px.dx, -px.dy);
-  }
-
-  // เรียกทุกครั้งที่ได้ /odom
-  void updateOdom({required double x, required double y, required double yaw}) {
-    robotMeters.value = Offset(x, y);
-    robotYaw.value = yaw;
-    if (followRobot.value) {
-      // โหมดติดตาม: อัปเดตเมทริกซ์ให้หุ่นอยู่กลางเสมอ
-      recenterOnRobot();
-    }
-  }
-
   @override
   void onInit() async {
-    super.onInit();
-    ever(robotMeters, (_) {
-      if (followRobot.value) recenterOnRobot();
-    });
-    await GetStorage.init('Storage');
-    await GetStorage.init('app');
+    await GetStorage.init('setting');
     try {
-      if (box.read('cards') == null) {
-        box.write('cards', <dynamic>[]);
-      } else {
-        cards.value = box.read('cards');
-      }
-
-      initProfile();
+      _loadProfiles();
     } catch (e, st) {
-      talker.handle(e, st, 'main controller / onInit ');
+      talker.handle(e, st, 'main controller / onInit');
     }
-  }
-
-  void initProfile() {
-    final raw = box.read<List>(kProfiles) ?? [];
-    profiles.assignAll(raw.map((e) => Map<String, dynamic>.from(e)));
-
-    selectedIndex.value = (box.read(kSelected) ?? 0) as int;
-    if (profiles.isNotEmpty) {
-      selectedIndex.value = selectedIndex.value.clamp(0, profiles.length - 1);
-    } else {
-      profiles.assignAll(_defaultProfiles());
-      selectedIndex.value = 0;
-      _persistProfiles();
-    }
-
-    robotType.value = (box.read(kRobotType) ?? '') as String;
-    ipWebSocket.value.text = (box.read(kIp) ?? '') as String;
-    ipCamera.value.text = (box.read(kCamera) ?? '') as String;
-    linearSpeed.value = ((box.read(kLinear) ?? 0.0) as num).toDouble();
-    angularSpeed.value = ((box.read(kAngular) ?? 0.0) as num).toDouble();
-    samplingRate.value = ((box.read(kSample) ?? 0.0) as num).toDouble();
-
-    ever<int>(selectedIndex, (_) => _applySelectionToFields());
-
-    _applySelectionToFields();
-  }
-
-  void _applySelectionToFields() {
-    if (profiles.isEmpty) return;
-    final p = profiles[selectedIndex.value.clamp(0, profiles.length - 1)];
-    robotType.value = (p['robType'] ?? '') as String;
-    ipWebSocket.value.text = (p['ip'] ?? '') as String;
-    ipCamera.value.text = (p['camera'] ?? '') as String;
-    linearSpeed.value = ((p['linearSpeed'] ?? 0.0) as num).toDouble();
-    angularSpeed.value = ((p['angularSpeed'] ?? 0.0) as num).toDouble();
-    samplingRate.value = ((p['samplingRate'] ?? 0.0) as num).toDouble();
-
-    _persistScalars();
-  }
-
-  void selectRobotByIndex(int idx) {
-    if (idx < 0 || idx >= profiles.length) return;
-    selectedIndex.value = idx;
-    box.write(kSelected, idx);
-    disconnect.value = false;
-    connectionRos.value = 'Connected';
-  }
-
-  void selectRobot(Map<String, dynamic> robot) {
-    final robType = (robot['robType'] ?? '') as String;
-    final idx = profiles.indexWhere((p) => p['robType'] == robType);
-    if (idx != -1) {
-      selectRobotByIndex(idx);
-    }
-  }
-
-  void applyIpRobot() {
-    if (profiles.isEmpty) return;
-    final idx = selectedIndex.value.clamp(0, profiles.length - 1);
-    final p = Map<String, dynamic>.from(profiles[idx]);
-
-    //    p['robType'] = robotType.value;
-    p['ip'] = ipWebSocket.value.text.trim();
-    p['camera'] = ipCamera.value.text.trim();
-    p['linearSpeed'] = linearSpeed.value;
-    p['angularSpeed'] = angularSpeed.value;
-    p['samplingRate'] = samplingRate.value;
-
-    profiles[idx] = p;
-    profiles.refresh();
-    _persistProfiles();
-    _persistScalars();
-    // reDisconnectAndConnect();
-    ToastService.showToast(
-      title: 'Success',
-      description: 'Settings saved successfully',
-      type: ToastificationType.success,
-    );
-  }
-
-  // void resetToDefault() {
-  //   if (profiles.isEmpty) return;
-
-  //   final currentType = robotType.value;
-  //   final def = _defaultProfiles().firstWhere(
-  //     (e) => e['robType'] == currentType,
-  //     orElse: () => _defaultProfiles().first,
-  //   );
-
-  //   robotType.value = (def['robType'] ?? '') as String;
-  //   ipWebSocket.value.text = (def['ip'] ?? '') as String;
-  //   ipCamera.value.text = (def['camera'] ?? '') as String;
-  //   linearSpeed.value = ((def['linearSpeed'] ?? 0.0) as num).toDouble();
-  //   angularSpeed.value = ((def['angularSpeed'] ?? 0.0) as num).toDouble();
-  //   samplingRate.value = ((def['samplingRate'] ?? 0.0) as num).toDouble();
-
-  //   applyIpRobot();
-  // }
-
-  void _persistProfiles() {
-    box.write(
-      kProfiles,
-      profiles.map((e) => Map<String, dynamic>.from(e)).toList(),
-    );
-  }
-
-  void _persistScalars() {
-    box.write(kSelected, selectedIndex.value);
-    box.write(kRobotType, robotType.value);
-    box.write(kIp, ipWebSocket.value.text);
-    box.write(kCamera, ipCamera.value.text);
-    box.write(kLinear, linearSpeed.value);
-    box.write(kAngular, angularSpeed.value);
-    box.write(kSample, samplingRate.value);
-  }
-
-  /*------------------------------ Services--------------------------------------*/
-  /// Convert all string values "true"/"false" in a map to actual booleans.
-  Map<String, dynamic> convertStringBools(Map<String, dynamic> input) {
-    return input.map((key, value) {
-      if (value is String) {
-        if (value.toLowerCase() == 'true') {
-          return MapEntry(key, true);
-        } else if (value.toLowerCase() == 'false') {
-          return MapEntry(key, false);
-        }
-      }
-      return MapEntry(key, value);
-    });
-  }
-
-  /// Save cards to persistent storage.
-  void syncToStorage() {
-    box.write('cards', cards);
-    talker.info('syncToStorage $cards');
-  }
-
-  /// Clear text controllers used when adding/editing a card.
-  void clearTextController() {
-    labelTextField.value.clear();
-    serviceTextField.value.clear();
-    textControllerArgs.clear();
-    textControllerData.clear();
-    textControllerArgs.value = [TextEditingController()];
-    textControllerData.value = [TextEditingController()];
-    args.value = 1;
-    data.value = 1;
+    super.onInit();
   }
 
   /*------------------------------ Websocket--------------------------------------*/
@@ -459,7 +111,7 @@ class MainController extends GetxController {
             switch (decodeData['op']) {
               case 'publish':
                 try {
-                  // handlePublish(decodeData);
+                  handlePublish(decodeData);
                 } catch (e, st) {
                   talker.handle(e, st, 'ros_publish  $data');
                 }
@@ -550,15 +202,6 @@ class MainController extends GetxController {
   }
 
   void statusRobot() async {
-    // Map advertiseMoveJoint = {
-    //   "op": "advertise",
-    //   "topic": "/move_joint_manual",
-    //   "type": "std_msgs/msg/String",
-    // };
-    // sendData(jsonEncode(advertiseMoveJoint));
-
-    // await Future.delayed(const Duration(milliseconds: 100));
-
     Map publishJoyStick = {
       "op": "advertise",
       "topic": "/cmd_vel",
@@ -568,15 +211,81 @@ class MainController extends GetxController {
 
     await Future.delayed(const Duration(milliseconds: 100));
 
-    // Map advertiseSpeech = {
-    //   "op": "advertise",
-    //   "topic": "/speech_input",
-    //   "type": "std_msgs/msg/String",
-    // };
-    // sendData(jsonEncode(advertiseSpeech));
+    Map cmdList = {
+      "op": "subscribe",
+      "topic": "/robot_mover/unitree_high_level_cmd_list",
+      "type": "std_msgs/msg/String",
+      "throttle_rate": 5000,
+    };
+    sendData(jsonEncode(cmdList));
+
+    await Future.delayed(const Duration(milliseconds: 100));
+
+    Map cmdMover = {
+      "op": "subscribe",
+      "topic": "/robot_mover/response_loco",
+      "type": "std_msgs/msg/String",
+      "throttle_rate": 1000,
+    }; //status robot
+    sendData(jsonEncode(cmdMover));
+
+    await Future.delayed(const Duration(milliseconds: 100));
+
+    Map cmdCapture = {
+      "op": "subscribe",
+      "topic": "/g1_left_arms_joint_state_publisher/arms_postures_list",
+      "type": "std_msgs/msg/String",
+      "throttle_rate": 1000,
+    };
+    sendData(jsonEncode(cmdCapture));
+
+    await Future.delayed(const Duration(milliseconds: 100));
+
+    Map cmdReadJoint = {
+      "op": "subscribe",
+      "topic": "/joint_states",
+      "type": "sensor_msgs/msg/JointState",
+      "throttle_rate": 100,
+    };
+    sendData(jsonEncode(cmdReadJoint));
+
+    Map advertiseMoveJoint = {
+      "op": "advertise",
+      "topic": "/move_joint_manual",
+      "type": "std_msgs/msg/String",
+    };
+    sendData(jsonEncode(advertiseMoveJoint));
+
+    await Future.delayed(const Duration(milliseconds: 100));
+
+    Map advertiseSpeech = {
+      "op": "advertise",
+      "topic": "/speech_input",
+      "type": "std_msgs/msg/String",
+    };
+    sendData(jsonEncode(advertiseSpeech));
+
+    await Future.delayed(const Duration(milliseconds: 100));
+
+    Map subScribeAudio = {
+      "op": "subscribe",
+      "topic": "/agent_audio_gen",
+      "type": "std_msgs/msg/String",
+      "throttle_rate": 1000,
+    }; //status robot
+    sendData(jsonEncode(subScribeAudio));
+
+    await Future.delayed(const Duration(milliseconds: 100));
+
+    Map humanoidArmControl = {
+      "op": "call_service",
+      "service": "/humanoid_arm_control/run_manipulator",
+      "type": "std_srvs/srv/SetBool",
+      "args": {"data": false},
+    };
+    sendData(jsonEncode(humanoidArmControl));
 
     // await Future.delayed(const Duration(milliseconds: 100));
-
     // //------------- subscribe topics -------------
     // Map textAi = {
     //   "op": "subscribe",
@@ -584,213 +293,347 @@ class MainController extends GetxController {
     //   "type": "std_msgs/msg/String",
     // };
     // sendData(jsonEncode(textAi));
-
-    // await Future.delayed(const Duration(milliseconds: 100));
-
-    // Map cmdList = {
-    //   "op": "subscribe",
-    //   "topic": "/robot_mover/unitree_high_level_cmd_list",
-    //   "type": "std_msgs/msg/String",
-    //   "throttle_rate": 5000,
-    // };
-    // sendData(jsonEncode(cmdList));
-
-    // await Future.delayed(const Duration(milliseconds: 100));
-
-    // Map cmdMover = {
-    //   "op": "subscribe",
-    //   "topic": "/robot_mover/response_loco",
-    //   "type": "std_msgs/msg/String",
-    //   "throttle_rate": 1000,
-    // }; //status robot
-    // sendData(jsonEncode(cmdMover));
-
-    // await Future.delayed(const Duration(milliseconds: 100));
-
-    // Map cmdCapture = {
-    //   "op": "subscribe",
-    //   "topic": "/g1_left_arms_joint_state_publisher/arms_postures_list",
-    //   "type": "std_msgs/msg/String",
-    //   "throttle_rate": 1000,
-    // };
-    // sendData(jsonEncode(cmdCapture));
-
-    // await Future.delayed(const Duration(milliseconds: 100));
-
-    // Map cmdReadJoint = {
-    //   "op": "subscribe",
-    //   "topic": "/joint_states",
-    //   "type": "sensor_msgs/msg/JointState",
-    //   "throttle_rate": 100,
-    // };
-    // sendData(jsonEncode(cmdReadJoint));
-
-    // Map subScribeAudio = {
-    //   "op": "subscribe",
-    //   "topic": "/agent_audio_gen",
-    //   "type": "std_msgs/msg/String",
-    //   "throttle_rate": 1000,
-    // }; //status robot
-    // sendData(jsonEncode(subScribeAudio));
-
-    // await Future.delayed(const Duration(milliseconds: 100));
-
-    // Map humanoidArmControl = {
-    //   "op": "call_service",
-    //   "service": "/humanoid_arm_control/run_manipulator",
-    //   "type": "std_srvs/srv/SetBool",
-    //   "args": {"data": false},
-    // };
-    // sendData(jsonEncode(humanoidArmControl));
   }
 
-  // void handlePublish(Map data) {
-  //   final UrdfController urdfController = Get.find<UrdfController>();
+  void handlePublish(Map data) {
+   // final UrdfController urdfController = Get.find<UrdfController>();
 
-  //   switch (data['topic']) {
-  //     case '/joint_states':
-  //       try {
-  //         if (urdfController.disableReceiveJointState.value) {
-  //           // talker.info('Joint states updates are disabled');
-  //           return;
-  //         }
+    switch (data['topic']) {
+      // case '/joint_states':
+      //   try {
+      //     if (urdfController.disableReceiveJointState.value) {
+      //       // talker.info('Joint states updates are disabled');
+      //       return;
+      //     }
 
-  //         final msg = data['msg'];
-  //         final List<dynamic> positions = msg['position'] ?? [];
+      //     final msg = data['msg'];
+      //     final List<dynamic> positions = msg['position'] ?? [];
 
-  //         // เก็บเฉพาะค่าที่เปลี่ยนแปลง
-  //         Map<String, double> changedValues = {};
+      //     Map<String, double> changedValues = {};
 
-  //         jointIndexMap.forEach((jointName, index) {
-  //           if (index < positions.length) {
-  //             final double newValue = positions[index].toDouble();
-  //             final double currentValue = urdfController.getJointValue(
-  //               jointName,
-  //             );
+      //     jointIndexMap.forEach((jointName, index) {
+      //       if (index < positions.length) {
+      //         final double newValue = positions[index].toDouble();
+      //         final double currentValue = urdfController.getJointValue(
+      //           jointName,
+      //         );
 
-  //             // ตรวจสอบการเปลี่ยนแปลงด้วย tolerance
-  //             if ((newValue - currentValue).abs() > 0.001) {
-  //               changedValues[jointName] = newValue;
-  //             }
-  //           }
-  //         });
+      //         if ((newValue - currentValue).abs() > 0.001) {
+      //           changedValues[jointName] = newValue;
+      //         }
+      //       }
+      //     });
 
-  //         // เซ็ตเฉพาะค่าที่เปลี่ยนแปลง
-  //         if (changedValues.isNotEmpty) {
-  //           changedValues.forEach((jointName, value) {
-  //             urdfController.setJointValue(jointName, value);
-  //           });
+      //     if (changedValues.isNotEmpty) {
+      //       changedValues.forEach((jointName, value) {
+      //         urdfController.setJointValue(jointName, value);
+      //       });
 
-  //           // Optional: Log จำนวนค่าที่เปลี่ยน (สำหรับ debug)
-  //           // talker.info('Updated ${changedValues.length} joints');
-  //         }
-  //       } catch (e) {
-  //         talker.error('Error handling joint_states: $e');
-  //       }
-  //       break;
+      //       // talker.info('Updated ${changedValues.length} joints');
+      //     }
+      //   } catch (e) {
+      //     talker.error('Error handling joint_states: $e');
+      //   }
+      //   break;
 
-  //     case '/g1_left_arms_joint_state_publisher/arms_postures_list':
-  //       try {
-  //         final msg = data['msg'];
-  //         final dataStr = msg['data'];
+      // case '/g1_left_arms_joint_state_publisher/arms_postures_list':
+      //   try {
+      //     final msg = data['msg'];
+      //     final dataStr = msg['data'];
 
-  //         if (dataStr is String) {
-  //           final decoded = jsonDecode(dataStr);
-  //           final postureList = decoded['postures'];
+      //     if (dataStr is String) {
+      //       final decoded = jsonDecode(dataStr);
+      //       final postureList = decoded['postures'];
 
-  //           if (postureList is List) {
-  //             final newPostures = List<String>.from(postureList);
-  //             if (!listEquals(postures, newPostures)) {
-  //               postures.value = newPostures;
-  //             }
-  //           }
-  //         }
-  //       } catch (e) {
-  //         talker.error('Error handling arms_postures_list: $e');
-  //       }
-  //       break;
+      //       if (postureList is List) {
+      //         final newPostures = List<String>.from(postureList);
+      //         if (!listEquals(postures, newPostures)) {
+      //           postures.value = newPostures;
+      //         }
+      //       }
+      //     }
+      //   } catch (e) {
+      //     talker.error('Error handling arms_postures_list: $e');
+      //   }
+      //   break;
 
-  //     case '/robot_mover/unitree_high_level_cmd_list':
-  //       try {
-  //         final msg = data['msg'];
-  //         final dataStr = msg['data'];
+      // case '/robot_mover/unitree_high_level_cmd_list':
+      //   try {
+      //     final msg = data['msg'];
+      //     final dataStr = msg['data'];
 
-  //         if (dataStr is String) {
-  //           final decoded = jsonDecode(dataStr);
-  //           final servicesList = decoded['services'];
+      //     if (dataStr is String) {
+      //       final decoded = jsonDecode(dataStr);
+      //       final servicesList = decoded['services'];
 
-  //           if (servicesList is List) {
-  //             final newCommands = List<String>.from(servicesList);
-  //             if (!listEquals(command, newCommands)) {
-  //               command.value = newCommands;
-  //             }
-  //           }
-  //         }
-  //       } catch (e) {
-  //         talker.error('Error handling unitree_high_level_cmd_list: $e');
-  //       }
-  //       break;
+      //       if (servicesList is List) {
+      //         final newCommands = List<String>.from(servicesList);
+      //         if (!listEquals(command, newCommands)) {
+      //           command.value = newCommands;
+      //         }
+      //       }
+      //     }
+      //   } catch (e) {
+      //     talker.error('Error handling unitree_high_level_cmd_list: $e');
+      //   }
+      //   break;
 
-  //     case '/agent_audio_gen':
-  //       try {
-  //         final MicController micController = Get.find<MicController>();
-  //         // talker.info('ros_agent_audio_gen ${data['msg']['data']}');
-  //         if (audioPlayAtWeb.value == false) {
-  //           talker.info('Audio generation is disabled at web');
-  //           micController.isWaitAndPlaying.value = false;
-  //           return;
-  //         }
+      // case '/agent_audio_gen':
+      //   try {
+      //     final MicController micController = Get.find<MicController>();
+      //     // talker.info('ros_agent_audio_gen ${data['msg']['data']}');
+      //     if (audioPlayAtWeb.value == false) {
+      //       talker.info('Audio generation is disabled at web');
+      //       micController.isWaitAndPlaying.value = false;
+      //       return;
+      //     }
 
-  //         talker.warning('-------------------------> Receive Audio');
+      //     talker.warning('-------------------------> Receive Audio');
 
-  //         micController.playAudio(data['msg']['data']);
+      //     micController.playAudio(data['msg']['data']);
 
-  //         // if (decodeData['values']['success']) {
-  //         //   final MicController micController = Get.find<MicController>();
-  //         //   micController.playAudio(decodeData['values']['message']);
-  //         //   // talker.info(decodeData);
-  //         //   talker.info('audio res.');
-  //         // } else {
-  //         //   talker.error('Service Response: ${decodeData['values']}');
-  //         //   ToastService.showToast(title: 'ผิดพลาด', description: '${decodeData['values']}', type: ToastificationType.error);
-  //         // }
-  //       } catch (e, st) {
-  //         talker.handle(e, st, 'ros_agent_audio_gen');
-  //       }
-  //       break;
+      //     // if (decodeData['values']['success']) {
+      //     //   final MicController micController = Get.find<MicController>();
+      //     //   micController.playAudio(decodeData['values']['message']);
+      //     //   // talker.info(decodeData);
+      //     //   talker.info('audio res.');
+      //     // } else {
+      //     //   talker.error('Service Response: ${decodeData['values']}');
+      //     //   ToastService.showToast(title: 'ผิดพลาด', description: '${decodeData['values']}', type: ToastificationType.error);
+      //     // }
+      //   } catch (e, st) {
+      //     talker.handle(e, st, 'ros_agent_audio_gen');
+      //   }
+      //   break;
 
-  //     case '/agent_reasoning':
-  //       try {
-  //         // Map data = {op: publish, topic: /agent_reasoning, msg: {data: {"task_type": "general_question", "reasoning_steps": [{"type": "thought", "content": "\u0e1c\u0e39\u0e49\u0e43\u0e0a\u0e49\u0e15\u0e49\u0e2d\u0e07\u0e01\u0e32\u0e23: \u0e27\u0e31\u0e19\u0e19\u0e35\u0e49\u0e27\u0e31\u0e19\u0e2d\u0e30\u0e25\u0e31\u0e22", "step_number": 1}, {"type": "thought", "content": "\u0e1b\u0e23\u0e30\u0e40\u0e20\u0e17\u0e07\u0e32\u0e19: general_question", "step_number": 2}, {"type": "thought", "content": "\u0e19\u0e35\u0e48\u0e40\u0e1b\u0e47\u0e19\u0e04\u0e33\u0e16\u0e32\u0e21\u0e17\u0e31\u0e48\u0e27\u0e44\u0e1b", "step_number": 3}, {"type": "action", "content": "\u0e15\u0e2d\u0e1a\u0e42\u0e14\u0e22\u0e43\u0e0a\u0e49\u0e04\u0e27\u0e32\u0e21\u0e23\u0e39\u0e49\u0e17\u0e31\u0e48\u0e27\u0e44\u0e1b", "tool": null, "step_number": 4}, {"type": "conclusion", "content": "\u0e15\u0e2d\u0e1a\u0e04\u0e33\u0e16\u0e32\u0e21\u0e17\u0e31\u0e48\u0e27\u0e44\u0e1b\u0e40\u0e23\u0e35\u0e22\u0e1a\u0e23\u0e49\u0e2d\u0e22", "step_number": 5}], "final_answer": "\u0e27\u0e31\u0e19\u0e19\u0e35\u0e49\u0e40\u0e1b\u0e47\u0e19\u0e27\u0e31\u0e19\u0e1e\u0e38\u0e18\u0e04\u0e48\u0e30", "step_count": 5, "timestamp": "/home/fibo/winworkspace/HumanoidAgent"}}};
+      case '/agent_reasoning':
+        try {
+          // Map data = {op: publish, topic: /agent_reasoning, msg: {data: {"task_type": "general_question", "reasoning_steps": [{"type": "thought", "content": "\u0e1c\u0e39\u0e49\u0e43\u0e0a\u0e49\u0e15\u0e49\u0e2d\u0e07\u0e01\u0e32\u0e23: \u0e27\u0e31\u0e19\u0e19\u0e35\u0e49\u0e27\u0e31\u0e19\u0e2d\u0e30\u0e25\u0e31\u0e22", "step_number": 1}, {"type": "thought", "content": "\u0e1b\u0e23\u0e30\u0e40\u0e20\u0e17\u0e07\u0e32\u0e19: general_question", "step_number": 2}, {"type": "thought", "content": "\u0e19\u0e35\u0e48\u0e40\u0e1b\u0e47\u0e19\u0e04\u0e33\u0e16\u0e32\u0e21\u0e17\u0e31\u0e48\u0e27\u0e44\u0e1b", "step_number": 3}, {"type": "action", "content": "\u0e15\u0e2d\u0e1a\u0e42\u0e14\u0e22\u0e43\u0e0a\u0e49\u0e04\u0e27\u0e32\u0e21\u0e23\u0e39\u0e49\u0e17\u0e31\u0e48\u0e27\u0e44\u0e1b", "tool": null, "step_number": 4}, {"type": "conclusion", "content": "\u0e15\u0e2d\u0e1a\u0e04\u0e33\u0e16\u0e32\u0e21\u0e17\u0e31\u0e48\u0e27\u0e44\u0e1b\u0e40\u0e23\u0e35\u0e22\u0e1a\u0e23\u0e49\u0e2d\u0e22", "step_number": 5}], "final_answer": "\u0e27\u0e31\u0e19\u0e19\u0e35\u0e49\u0e40\u0e1b\u0e47\u0e19\u0e27\u0e31\u0e19\u0e1e\u0e38\u0e18\u0e04\u0e48\u0e30", "step_count": 5, "timestamp": "/home/fibo/winworkspace/HumanoidAgent"}}};
 
-  //         final String reasoningData = data['msg']['data'];
-  //         final Map<String, dynamic> reasoningMap = jsonDecode(reasoningData);
+          final String reasoningData = data['msg']['data'];
+          final Map<String, dynamic> reasoningMap = jsonDecode(reasoningData);
 
-  //         String finalAnswer = reasoningMap['final_answer'] ?? '';
-  //         List<dynamic> reasoningSteps = reasoningMap['reasoning_steps'] ?? [];
-  //         String stepsDescription = reasoningSteps
-  //             .map((step) => "${step['step_number']}. ${step['content']}")
-  //             .join('\n');
+          String finalAnswer = reasoningMap['final_answer'] ?? '';
+          List<dynamic> reasoningSteps = reasoningMap['reasoning_steps'] ?? [];
+          String stepsDescription = reasoningSteps
+              .map((step) => "${step['step_number']}. ${step['content']}")
+              .join('\n');
 
-  //         ToastService.showToast(
-  //           title: finalAnswer, // หรือจะเป็น "สรุปคำตอบ" ก็ได้
-  //           description: stepsDescription, // รายละเอียด reasoning steps
-  //           type: ToastificationType.success,
-  //           duration: Duration(seconds: 30),
-  //         );
+          ToastService.showToast(
+            title: finalAnswer, 
+            description: stepsDescription, 
+            type: ToastificationType.success,
+            duration: Duration(seconds: 30),
+          );
 
-  //         // talker.warning('agent_reasoning $reasoningMap');
-  //       } catch (e, st) {
-  //         talker.handle(e, st, 'agent_reasoning');
-  //       }
-  //       break;
+          // talker.warning('agent_reasoning $reasoningMap');
+        } catch (e, st) {
+          talker.handle(e, st, 'agent_reasoning');
+        }
+        break;
 
-  //     case '/robot_mover/response_loco':
-  //       break;
+      case '/robot_mover/response_loco':
+        break;
 
-  //     default:
-  //       talker.warning('ros_service_response $data');
-  //       break;
-  //   }
-  // }
+      default:
+        talker.warning('ros_service_response $data');
+        break;
+    }
+  }
+
+  /*------------------------------ Settings --------------------------------------*/
+  void _loadProfiles() {
+    final raw = (box.read<List>('profiles') ?? []);
+    final migrated =
+        raw.map((e) {
+          final m = Map<String, dynamic>.from(e);
+          if (m.containsKey('robType') && !m.containsKey('robotType')) {
+            m['robotType'] = m.remove('robType');
+          }
+          return m;
+        }).toList();
+
+    profiles.assignAll(migrated.map(Profile.fromMap).toList());
+
+    if (profiles.isEmpty) {
+      profiles.assignAll(defaultProfiles());
+      selectedIndex.value = 0;
+      _persistProfiles();
+    } else {
+      final idx = (box.read('selectedIndex') ?? 0) as int;
+      selectedIndex.value = idx.clamp(0, profiles.length - 1);
+    }
+
+    if (migrated.length == raw.length &&
+        raw.any((e) => (e as Map).containsKey('robType'))) {
+      _persistProfiles();
+    }
+
+    ever<int>(selectedIndex, (_) => _pullFromCurrent());
+    _pullFromCurrent();
+  }
+
+  void _pullFromCurrent() {
+    if (profiles.isEmpty) return;
+    final p = current;
+    robotType.value = p.robotType;
+    ipWebSocket.value.text = p.ip;
+    ipCamera.value.text = p.camera;
+    linearSpeed.value = p.linearSpeed;
+    angularSpeed.value = p.angularSpeed;
+    samplingRate.value = p.samplingRate;
+    _persistScalars();
+  }
+
+  void saveCurrent() {
+    if (profiles.isEmpty) return;
+    final p =
+        current
+          ..ip = ipWebSocket.value.text.trim()
+          ..camera = ipCamera.value.text.trim()
+          ..linearSpeed = linearSpeed.value
+          ..angularSpeed = angularSpeed.value
+          ..samplingRate = samplingRate.value;
+
+    profiles[selectedIndex.value] = p;
+    profiles.refresh();
+    _persistProfiles();
+    _persistScalars();
+
+    ToastService.showToast(
+      title: 'Success',
+      description: 'Settings saved successfully',
+      type: ToastificationType.success,
+    );
+  }
+
+  void resetToDefault() {
+    final def = defaultProfiles().firstWhere(
+      (e) => e.robotType == robotType.value,
+      orElse: () => defaultProfiles().first,
+    );
+    profiles[selectedIndex.value] = Profile.fromMap(def.toMap());
+    profiles.refresh();
+    _pullFromCurrent();
+    _persistProfiles();
+  }
+
+  void selectRobot(int idx) {
+    if (idx < 0 || idx >= profiles.length) return;
+    selectedIndex.value = idx;
+    box.write('selectedIndex', idx);
+    reDisconnectAndConnect();
+  }
+
+  void _persistProfiles() =>
+      box.write('profiles', profiles.map((e) => e.toMap()).toList());
+
+  void _persistScalars() {
+    box.write('selectedIndex', selectedIndex.value);
+    box.write('robotType', robotType.value);
+    box.write('ip', ipWebSocket.value.text);
+    box.write('camera', ipCamera.value.text);
+    box.write('linearSpeed', linearSpeed.value);
+    box.write('angularSpeed', angularSpeed.value);
+    box.write('samplingRate', samplingRate.value);
+  }
+
+  /*------------------------------ Others--------------------------------------*/
+  void toggleLayer() {
+    showLayer.value = !showLayer.value;
+  }
+
+  void toggleGlobalCostmap() {
+    showGlobalCostmap.value = !showGlobalCostmap.value;
+  }
+
+  void toggleLocalCostmap() {
+    showLocalCostmap.value = !showLocalCostmap.value;
+  }
+
+  void toggleLaser() {
+    showLaser.value = !showLaser.value;
+  }
+
+  void togglePointCloud() {
+    showPointCloud.value = !showPointCloud.value;
+  }
+
+  void toggleRelocation() {
+    showRelocation.value = !showRelocation.value;
+  }
+
+  void toggleCamera() {
+    showCamera.value = !showCamera.value;
+  }
+
+  void toggleJoy() {
+    showJoy.value = !showJoy.value;
+  }
+
+  RxDouble mapResolution = 0.05.obs;
+  double get pxPerMeter => 1.0 / mapResolution.value;
+
+  Rx<Offset> robotMeters = Offset.zero.obs;
+  RxDouble robotYaw = 0.0.obs;
+
+  final TransformationController mapTC = TransformationController();
+  final GlobalKey mapAreaKey = GlobalKey();
+  final double mapMinScale = 0.4;
+  final double mapMaxScale = 10.0;
+
+  RxBool followRobot = false.obs;
+
+  void toggleFollow() {
+    followRobot.value = !followRobot.value;
+    if (followRobot.value) {
+      recenterOnRobot();
+    }
+  }
+
+  void zoomBy(double factor) {
+    final ctx = mapAreaKey.currentContext;
+    final box = ctx?.findRenderObject() as RenderBox?;
+    if (box == null) return;
+    final center = box.size.center(Offset.zero);
+
+    final current = mapTC.value.getMaxScaleOnAxis();
+    final target = (current * factor).clamp(mapMinScale, mapMaxScale);
+    final safeFactor = target / current;
+
+    final m =
+        Matrix4.copy(mapTC.value)
+          // ignore: deprecated_member_use
+          ..translate(center.dx, center.dy)
+          // ignore: deprecated_member_use
+          ..scale(safeFactor)
+          // ignore: deprecated_member_use
+          ..translate(-center.dx, -center.dy);
+    mapTC.value = m;
+
+    if (followRobot.value) recenterOnRobot();
+  }
+
+  void recenterOnRobot() {
+    final ctx = mapAreaKey.currentContext;
+    final box = ctx?.findRenderObject() as RenderBox?;
+    if (box == null) return;
+
+    final center = box.size.center(Offset.zero);
+    final scale = mapTC.value.getMaxScaleOnAxis();
+
+    final px = Offset(
+      robotMeters.value.dx * pxPerMeter,
+      robotMeters.value.dy * pxPerMeter,
+    );
+
+    mapTC.value =
+        Matrix4.identity()
+          // ignore: deprecated_member_use
+          ..translate(center.dx, center.dy)
+          // ignore: deprecated_member_use
+          ..scale(scale)
+          // ignore: deprecated_member_use
+          ..translate(-px.dx, -px.dy);
+  }
 }

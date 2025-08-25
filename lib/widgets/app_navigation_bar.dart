@@ -46,12 +46,12 @@ class _SidebarNavigation extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 16),
       child: Column(
         children: [
-          Icon(Icons.android, color: Colors.white, size: 24),
+          Icon(Icons.psychology_rounded, color: Colors.white, size: 32),
           SizedBox(height: 28),
           Column(
             children: [
               _NavIcon(
-                icon: Icons.dashboard,
+                icon: Icons.dashboard_rounded,
                 size: 20,
                 selected: selectedIndex == 0,
                 onTap: () => onTap(0),
@@ -79,7 +79,7 @@ class _SidebarNavigation extends StatelessWidget {
               ),
               SizedBox(height: 12),
               _NavIcon(
-                icon: Icons.auto_fix_high_rounded,
+                icon: Icons.engineering_rounded,
                 size: 20,
                 selected: selectedIndex == 4,
                 onTap: () => onTap(4),
@@ -125,7 +125,7 @@ class _BottomNavigation extends StatelessWidget {
           label: '',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.auto_fix_high_rounded, size: 20),
+          icon: Icon(Icons.engineering_rounded, size: 20),
           label: '',
         ),
       ],
@@ -176,7 +176,7 @@ class _FloatingNavigation extends StatelessWidget {
                   _spacer(),
                   _navButton(3, Icons.settings_rounded),
                   _spacer(),
-                  _navButton(4, Icons.auto_fix_high_rounded),
+                  _navButton(4, Icons.engineering_rounded),
                 ] else ...[
                   _navButton(selectedIndex, _iconForIndex(selectedIndex)),
                 ],

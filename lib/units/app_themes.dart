@@ -4,7 +4,7 @@ import 'app_colors.dart';
 TextTheme textTheme() {
   return const TextTheme(
     bodyLarge: TextStyle(
-      fontSize: 14,
+      fontSize: 16,
       fontWeight: FontWeight.normal,
       color: Colors.white,
       overflow: TextOverflow.ellipsis,
@@ -12,11 +12,11 @@ TextTheme textTheme() {
     bodyMedium: TextStyle(
       fontSize: 14,
       fontWeight: FontWeight.normal,
-      color: Colors.white,
+      color: AppColors.grey,
       overflow: TextOverflow.ellipsis,
     ),
     bodySmall: TextStyle(
-      fontSize: 14,
+      fontSize: 12,
       fontWeight: FontWeight.normal,
       color: AppColors.grey,
       overflow: TextOverflow.ellipsis,
@@ -54,7 +54,7 @@ TextTheme textTheme() {
     labelSmall: TextStyle(
       fontSize: 12,
       fontWeight: FontWeight.w400,
-      color: AppColors.grey,
+      color: Colors.white,
       overflow: TextOverflow.ellipsis,
     ),
   );
