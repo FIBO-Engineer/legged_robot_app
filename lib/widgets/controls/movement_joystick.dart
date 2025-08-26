@@ -28,18 +28,21 @@ class MovementJoystick extends StatelessWidget {
           size: sizeJoy,
           mode: JoystickMode.all,
           decoration: JoystickBaseDecoration(
-            color:  AppColors.card.withValues(alpha: 0.1),
+            // ignore: deprecated_member_use
+            color:  AppColors.card.withOpacity(0.3),
             drawOuterCircle: false,
           ),
           arrowsDecoration: JoystickArrowsDecoration(
-            color: AppColors.red.withValues(alpha: 70),
+            // ignore: deprecated_member_use
+            color: AppColors.red.withOpacity(0.6),
             enableAnimation: false,
           ),
         ),
         stick: JoystickStick(
           size: sizeBall,
           decoration: JoystickStickDecoration(
-            color: AppColors.red.withValues(alpha: 30),
+            // ignore: deprecated_member_use
+            color: AppColors.red.withOpacity(0.7),
           ),
         ),
         period: Duration(

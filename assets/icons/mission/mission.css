@@ -1,0 +1,21 @@
+
+@font-face {
+  font-family: "missionfont";
+  src: url("../gamepad/iconfont.ttf?t=1720531460424") format("truetype");
+}
+
+.missionfont {
+  font-family: "missionfont" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.mis-mission:before        { content: "\efe3"; } 
+.mis-mission-plan:before   { content: "\e635"; } 
+.mis-waypoint:before       { content: "\e8a5"; }
+.mis-route:before          { content: "\ea45"; } 
+.mis-controller:before     { content: "\ec34"; } 
+.mis-robot:before          { content: "\ec38"; } 
+.mis-target:before         { content: "\e643"; } 

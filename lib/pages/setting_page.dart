@@ -72,7 +72,7 @@ class SettingScreen extends StatelessWidget {
               _profileWidget(controller, theme),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 10),
           _Section(
             title: 'Basic Setting',
             child: _BasicSetting(controller: controller, screen: screen),
@@ -243,7 +243,7 @@ class _BasicSetting extends StatelessWidget {
     return Obx(() {
       if (screen.isPortrait) {
         return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             tf(
               controller: controller.ipWebSocket.value,

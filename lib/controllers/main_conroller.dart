@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -8,12 +9,66 @@ import 'package:toastification/toastification.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import '../models/robot_profile.dart';
 import '../services/talker_service.dart';
+import 'urdf_controller.dart';
 
 class MainController extends GetxController {
   WebSocketChannel? channel;
   Timer? _heartbeatTimer;
   RxString connectionRos = 'Disconnected'.obs;
   RxBool disconnect = true.obs;
+
+  final Map<String, int> jointIndexMap = {
+    "left_hip_pitch_joint": 0,
+    "left_hip_roll_joint": 1,
+    "left_hip_yaw_joint": 2,
+    "left_knee_joint": 3,
+    "left_ankle_pitch_joint": 4,
+    "left_ankle_roll_joint": 5,
+    "right_hip_pitch_joint": 6,
+    "right_hip_roll_joint": 7,
+    "right_hip_yaw_joint": 8,
+    "right_knee_joint": 9,
+    "right_ankle_pitch_joint": 10,
+    "right_ankle_roll_joint": 11,
+    "waist_yaw_joint": 12,
+    "left_shoulder_pitch_joint": 13,
+    "left_shoulder_roll_joint": 14,
+    "left_shoulder_yaw_joint": 15,
+    "left_elbow_joint": 16,
+    "left_wrist_roll_joint": 17,
+    "right_shoulder_pitch_joint": 18,
+    "right_shoulder_roll_joint": 19,
+    "right_shoulder_yaw_joint": 20,
+    "right_elbow_joint": 21,
+    "right_wrist_roll_joint": 22,
+  };
+  RxList postures =
+      <String>[
+        // 'stand',
+        // 'sit',
+        // 'lay',
+        // 'walk',
+        // 'run',
+        // 'jump',
+        // 'dance',
+        // 'wave',
+        // 'greet',
+        // 'pick_up',
+        // 'drop_off',
+        // 'turn_left',
+        // 'turn_right',
+        // 'set_continuous_movement',
+      ].obs;
+
+  RxList command =
+      <String>[
+        // "/robot_mover/stand",
+        // "/robot_mover/sit",
+        // "robot_mover/set_continuous_movement",
+        // "robot_mover/set_continuous_movement_test_in_fibonaci",
+      ].obs;
+  RxBool isHide = false.obs;
+  RxInt speedLevel = 0.obs;
 
   /*------------------------------ Setting --------------------------------------*/
   final box = GetStorage('setting');
@@ -57,6 +112,7 @@ class MainController extends GetxController {
   }
 
   /*------------------------------ Websocket--------------------------------------*/
+
   void reDisconnectAndConnect() async {
     talker.info('reDisconnectAndConnect');
     await disconnectRobot();
@@ -77,26 +133,17 @@ class MainController extends GetxController {
     connectWS();
   }
 
-  void resetReconnect() async {
-    if (disconnect.value) return;
-
-    if (channel != null) {
-      channel!.sink.close();
-      channel = null;
-    }
-    await Future.delayed(const Duration(seconds: 3));
-    connectWS();
-  }
-
   Future connectWS() async {
     try {
+      // talker.info('connect_ws ');
+
       if (channel != null) {
         talker.warning('connect_ws_already_connected ');
         return;
       }
 
       connectionRos.value = 'Connecting';
-      talker.info('connect_ws ${ipWebSocket.value}');
+      talker.info('connect_ws ${ipWebSocket.value.text}');
 
       channel = WebSocketChannel.connect(Uri.parse(ipWebSocket.value.text));
 
@@ -128,6 +175,21 @@ class MainController extends GetxController {
                   } else {
                     talker.warning('Service Response: $decodeData');
                   }
+                  // talker.warning('Service Response: $decodeData');
+
+                  // if (decodeData['id'] == 'audio') {
+                  //   if (decodeData['values']['success']) {
+                  //     final MicController micController = Get.find<MicController>();
+                  //     micController.playAudio(decodeData['values']['message']);
+                  //     // talker.info(decodeData);
+                  //     talker.info('audio res.');
+                  //   } else {
+                  //     talker.error('Service Response: ${decodeData['values']}');
+                  //     ToastService.showToast(title: 'ผิดพลาด', description: '${decodeData['values']}', type: ToastificationType.error);
+                  //   }
+                  // }
+
+                  // talker.debug('ros_service_response $data');
                 } catch (e, st) {
                   talker.handle(e, st, 'ros_service_response ');
                 }
@@ -142,12 +204,15 @@ class MainController extends GetxController {
                 break;
 
               default:
+                // _log('tryConnect()', 'Listen Data (default)', '$decodeData');
                 talker.warning('ros_out_topic $data');
                 break;
             }
           } else {
             talker.warning('Unknown message type received $data');
           }
+
+          // talker.info('listen: ${jsonDecode(data)}');
         },
         onDone: () async {
           connectionRos.value = 'Disconnected';
@@ -179,35 +244,47 @@ class MainController extends GetxController {
     _heartbeatTimer?.cancel();
     _heartbeatTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
       if (channel != null) {
+        // talker.info('startHeartbeat');
         channel!.sink.add(jsonEncode(data));
       }
     });
   }
 
-  void sendData(String data) {
-    try {
-      if (channel != null) {
-        final truncatedData =
-            data.length > 80 ? '${data.substring(0, 80)}...' : data;
-        talker.debug('ros_send $truncatedData');
-        channel!.sink.add(data);
-      } else {
-        final truncatedData =
-            data.length > 80 ? '${data.substring(0, 80)}...' : data;
-        talker.warning('ros_send_not_ready $truncatedData');
-      }
-    } catch (e, st) {
-      talker.handle(e, st, 'ros_send_data');
-    }
-  }
-
   void statusRobot() async {
+    Map advertiseMoveJoint = {
+      "op": "advertise",
+      "topic": "/move_joint_manual",
+      "type": "std_msgs/msg/String",
+    };
+    sendData(jsonEncode(advertiseMoveJoint));
+
+    await Future.delayed(const Duration(milliseconds: 100));
+
     Map publishJoyStick = {
       "op": "advertise",
       "topic": "/cmd_vel",
       "type": "geometry_msgs/Twist",
     };
     sendData(jsonEncode(publishJoyStick));
+
+    await Future.delayed(const Duration(milliseconds: 100));
+
+    Map advertiseSpeech = {
+      "op": "advertise",
+      "topic": "/speech_input",
+      "type": "std_msgs/msg/String",
+    };
+    sendData(jsonEncode(advertiseSpeech));
+
+    await Future.delayed(const Duration(milliseconds: 100));
+
+    //------------- subscribe topics -------------
+    Map textAi = {
+      "op": "subscribe",
+      "topic": "/agent_reasoning",
+      "type": "std_msgs/msg/String",
+    };
+    sendData(jsonEncode(textAi));
 
     await Future.delayed(const Duration(milliseconds: 100));
 
@@ -249,24 +326,6 @@ class MainController extends GetxController {
     };
     sendData(jsonEncode(cmdReadJoint));
 
-    Map advertiseMoveJoint = {
-      "op": "advertise",
-      "topic": "/move_joint_manual",
-      "type": "std_msgs/msg/String",
-    };
-    sendData(jsonEncode(advertiseMoveJoint));
-
-    await Future.delayed(const Duration(milliseconds: 100));
-
-    Map advertiseSpeech = {
-      "op": "advertise",
-      "topic": "/speech_input",
-      "type": "std_msgs/msg/String",
-    };
-    sendData(jsonEncode(advertiseSpeech));
-
-    await Future.delayed(const Duration(milliseconds: 100));
-
     Map subScribeAudio = {
       "op": "subscribe",
       "topic": "/agent_audio_gen",
@@ -284,99 +343,123 @@ class MainController extends GetxController {
       "args": {"data": false},
     };
     sendData(jsonEncode(humanoidArmControl));
+  }
 
-    // await Future.delayed(const Duration(milliseconds: 100));
-    // //------------- subscribe topics -------------
-    // Map textAi = {
-    //   "op": "subscribe",
-    //   "topic": "/agent_reasoning",
-    //   "type": "std_msgs/msg/String",
-    // };
-    // sendData(jsonEncode(textAi));
+  void resetReconnect() async {
+    if (disconnect.value) return;
+
+    if (channel != null) {
+      channel!.sink.close();
+      channel = null;
+    }
+    await Future.delayed(const Duration(seconds: 3));
+    connectWS();
+  }
+
+  void sendData(String data) {
+    try {
+      if (channel != null) {
+        // ตัดข้อความให้เหลือ 30 ตัวอักษร
+        final truncatedData =
+            data.length > 80 ? '${data.substring(0, 80)}...' : data;
+        talker.debug('ros_send $truncatedData');
+        channel!.sink.add(data);
+      } else {
+        final truncatedData =
+            data.length > 80 ? '${data.substring(0, 80)}...' : data;
+        talker.warning('ros_send_not_ready $truncatedData');
+      }
+    } catch (e, st) {
+      talker.handle(e, st, 'ros_send_data');
+    }
   }
 
   void handlePublish(Map data) {
-   // final UrdfController urdfController = Get.find<UrdfController>();
+    final UrdfController urdfController = Get.find<UrdfController>();
 
     switch (data['topic']) {
-      // case '/joint_states':
-      //   try {
-      //     if (urdfController.disableReceiveJointState.value) {
-      //       // talker.info('Joint states updates are disabled');
-      //       return;
-      //     }
+      case '/joint_states':
+        try {
+          if (urdfController.disableReceiveJointState.value) {
+            // talker.info('Joint states updates are disabled');
+            return;
+          }
 
-      //     final msg = data['msg'];
-      //     final List<dynamic> positions = msg['position'] ?? [];
+          final msg = data['msg'];
+          final List<dynamic> positions = msg['position'] ?? [];
 
-      //     Map<String, double> changedValues = {};
+          // เก็บเฉพาะค่าที่เปลี่ยนแปลง
+          Map<String, double> changedValues = {};
 
-      //     jointIndexMap.forEach((jointName, index) {
-      //       if (index < positions.length) {
-      //         final double newValue = positions[index].toDouble();
-      //         final double currentValue = urdfController.getJointValue(
-      //           jointName,
-      //         );
+          jointIndexMap.forEach((jointName, index) {
+            if (index < positions.length) {
+              final double newValue = positions[index].toDouble();
+              final double currentValue = urdfController.getJointValue(
+                jointName,
+              );
 
-      //         if ((newValue - currentValue).abs() > 0.001) {
-      //           changedValues[jointName] = newValue;
-      //         }
-      //       }
-      //     });
+              // ตรวจสอบการเปลี่ยนแปลงด้วย tolerance
+              if ((newValue - currentValue).abs() > 0.001) {
+                changedValues[jointName] = newValue;
+              }
+            }
+          });
 
-      //     if (changedValues.isNotEmpty) {
-      //       changedValues.forEach((jointName, value) {
-      //         urdfController.setJointValue(jointName, value);
-      //       });
+          // เซ็ตเฉพาะค่าที่เปลี่ยนแปลง
+          if (changedValues.isNotEmpty) {
+            changedValues.forEach((jointName, value) {
+              urdfController.setJointValue(jointName, value);
+            });
 
-      //       // talker.info('Updated ${changedValues.length} joints');
-      //     }
-      //   } catch (e) {
-      //     talker.error('Error handling joint_states: $e');
-      //   }
-      //   break;
+            // Optional: Log จำนวนค่าที่เปลี่ยน (สำหรับ debug)
+            // talker.info('Updated ${changedValues.length} joints');
+          }
+        } catch (e) {
+          talker.error('Error handling joint_states: $e');
+        }
+        break;
 
-      // case '/g1_left_arms_joint_state_publisher/arms_postures_list':
-      //   try {
-      //     final msg = data['msg'];
-      //     final dataStr = msg['data'];
+      case '/g1_left_arms_joint_state_publisher/arms_postures_list':
+        try {
+          final msg = data['msg'];
+          final dataStr = msg['data'];
 
-      //     if (dataStr is String) {
-      //       final decoded = jsonDecode(dataStr);
-      //       final postureList = decoded['postures'];
+          if (dataStr is String) {
+            final decoded = jsonDecode(dataStr);
+            final postureList = decoded['postures'];
 
-      //       if (postureList is List) {
-      //         final newPostures = List<String>.from(postureList);
-      //         if (!listEquals(postures, newPostures)) {
-      //           postures.value = newPostures;
-      //         }
-      //       }
-      //     }
-      //   } catch (e) {
-      //     talker.error('Error handling arms_postures_list: $e');
-      //   }
-      //   break;
+            if (postureList is List) {
+              final newPostures = List<String>.from(postureList);
+              if (!listEquals(postures, newPostures)) {
+                postures.value = newPostures;
+              }
+            }
+          }
+        } catch (e) {
+          talker.error('Error handling arms_postures_list: $e');
+        }
+        break;
 
-      // case '/robot_mover/unitree_high_level_cmd_list':
-      //   try {
-      //     final msg = data['msg'];
-      //     final dataStr = msg['data'];
+      case '/robot_mover/unitree_high_level_cmd_list':
+        try {
+          final msg = data['msg'];
+          final dataStr = msg['data'];
 
-      //     if (dataStr is String) {
-      //       final decoded = jsonDecode(dataStr);
-      //       final servicesList = decoded['services'];
+          if (dataStr is String) {
+            final decoded = jsonDecode(dataStr);
+            final servicesList = decoded['services'];
 
-      //       if (servicesList is List) {
-      //         final newCommands = List<String>.from(servicesList);
-      //         if (!listEquals(command, newCommands)) {
-      //           command.value = newCommands;
-      //         }
-      //       }
-      //     }
-      //   } catch (e) {
-      //     talker.error('Error handling unitree_high_level_cmd_list: $e');
-      //   }
-      //   break;
+            if (servicesList is List) {
+              final newCommands = List<String>.from(servicesList);
+              if (!listEquals(command, newCommands)) {
+                command.value = newCommands;
+              }
+            }
+          }
+        } catch (e) {
+          talker.error('Error handling unitree_high_level_cmd_list: $e');
+        }
+        break;
 
       // case '/agent_audio_gen':
       //   try {
@@ -420,8 +503,8 @@ class MainController extends GetxController {
               .join('\n');
 
           ToastService.showToast(
-            title: finalAnswer, 
-            description: stepsDescription, 
+            title: finalAnswer, // หรือจะเป็น "สรุปคำตอบ" ก็ได้
+            description: stepsDescription, // รายละเอียด reasoning steps
             type: ToastificationType.success,
             duration: Duration(seconds: 30),
           );

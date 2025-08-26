@@ -1,22 +1,24 @@
 import 'package:get/get.dart';
 import 'package:legged_robot_app/pages/mission_page.dart';
 import '../bindings/root_binding.dart';
-import '../pages/dashboard_page.dart';
+import '../pages/home_page.dart';
+import '../pages/mapping_page.dart';
 import '../pages/service_page.dart';
-import '../pages/teleoperated_page.dart';
 import '../pages/setting_page.dart';
 
 final List<GetPage> appRoutes = [
   GetPage(
     name: '/main',
-    page: () => DashboardPage(),
+    //page: () => DashboardPage(),
+    page: () => HomePage(),
     transition: Transition.noTransition,
     binding: RootBinding(),
     //   middlewares: [AuthMiddleware()],
   ),
   GetPage(
     name: '/teleoperated',
-    page: () => TeleoperatedPage(),
+  //  page: () => TeleoperatedPage(),
+    page: () =>  MappingPage(),
     transition: Transition.noTransition,
     binding: RootBinding(),
     //   middlewares: [AuthMiddleware()],

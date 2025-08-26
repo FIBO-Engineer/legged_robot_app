@@ -1,0 +1,41 @@
+{
+    "font_family": "missionfont",
+    "css_prefix_text": "mis-",
+    "glyphs": [
+        {
+            "name": "mission",
+            "font_class": "mission",
+            "unicode": "efe3"
+        },
+        {
+            "name": "mission-plan",
+            "font_class": "mission-plan",
+            "unicode": "e635"
+        },
+        {
+            "name": "waypoint",
+            "font_class": "waypoint",
+            "unicode": "e8a5"
+        },
+        {
+            "name": "route",
+            "font_class": "route",
+            "unicode": "ea45"
+        },
+        {
+            "name": "controller",
+            "font_class": "controller",
+            "unicode": "ec34"
+        },
+        {
+            "name": "robot",
+            "font_class": "robot",
+            "unicode": "ec38"
+        },
+        {
+            "name": "target",
+            "font_class": "target",
+            "unicode": "e643"
+        }
+    ]
+}

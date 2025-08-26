@@ -3,6 +3,8 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  audioplayers_windows
+  flutter_angle
   flutter_webrtc
   share_plus
   url_launcher_windows

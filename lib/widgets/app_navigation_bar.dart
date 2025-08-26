@@ -40,7 +40,7 @@ class _SidebarNavigation extends StatelessWidget {
   const _SidebarNavigation({required this.selectedIndex, required this.onTap});
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return  Container(
       width: 56,
       color: AppColors.scaffold,
       padding: const EdgeInsets.symmetric(vertical: 16),
@@ -51,35 +51,35 @@ class _SidebarNavigation extends StatelessWidget {
           Column(
             children: [
               _NavIcon(
-                icon: Icons.dashboard_rounded,
+                icon: Icons.dashboard_outlined,
                 size: 20,
                 selected: selectedIndex == 0,
                 onTap: () => onTap(0),
               ),
               SizedBox(height: 12),
               _NavIcon(
-                icon: Icons.gamepad_rounded,
+                icon: IconData(0xea45, fontFamily: "GamePad"),
                 size: 20,
                 selected: selectedIndex == 1,
                 onTap: () => onTap(1),
               ),
               SizedBox(height: 12),
               _NavIcon(
-                icon: Icons.flag_rounded,
+                icon: Icons.flag_outlined,
                 size: 20,
                 selected: selectedIndex == 2,
                 onTap: () => onTap(2),
               ),
               SizedBox(height: 12),
               _NavIcon(
-                icon: Icons.settings_rounded,
+                icon: Icons.settings_outlined,
                 size: 20,
                 selected: selectedIndex == 3,
                 onTap: () => onTap(3),
               ),
               SizedBox(height: 12),
               _NavIcon(
-                icon: Icons.engineering_rounded,
+                icon: Icons.engineering_outlined,
                 size: 20,
                 selected: selectedIndex == 4,
                 onTap: () => onTap(4),
@@ -109,23 +109,23 @@ class _BottomNavigation extends StatelessWidget {
       onTap: onTap,
       items: const [
         BottomNavigationBarItem(
-          icon: Icon(Icons.dashboard_rounded, size: 20),
+          icon: Icon(Icons.dashboard_outlined, size: 20),
           label: '',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.gamepad_rounded, size: 20),
+          icon: Icon(IconData(0xea45, fontFamily: "GamePad"), size: 20),
           label: '',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.flag_rounded, size: 20),
+          icon: Icon(Icons.flag_outlined, size: 20),
           label: '',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.settings_rounded, size: 20),
+          icon: Icon(Icons.settings_outlined, size: 20),
           label: '',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.engineering_rounded, size: 20),
+          icon: Icon(Icons.engineering_outlined, size: 20),
           label: '',
         ),
       ],
@@ -168,15 +168,15 @@ class _FloatingNavigation extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 if (isExpanded) ...[
-                  _navButton(0, Icons.dashboard_rounded),
+                  _navButton(0, Icons.dashboard_outlined),
                   _spacer(),
-                  _navButton(1, Icons.gamepad_rounded),
+                  _navButton(1, IconData(0xea45, fontFamily: "GamePad")),
                   _spacer(),
-                  _navButton(2, Icons.flag_rounded),
+                  _navButton(2, Icons.flag_outlined),
                   _spacer(),
-                  _navButton(3, Icons.settings_rounded),
+                  _navButton(3, Icons.settings_outlined),
                   _spacer(),
-                  _navButton(4, Icons.engineering_rounded),
+                  _navButton(4, Icons.engineering_outlined),
                 ] else ...[
                   _navButton(selectedIndex, _iconForIndex(selectedIndex)),
                 ],
@@ -215,7 +215,7 @@ class _FloatingNavigation extends StatelessWidget {
       case 0:
         return Icons.dashboard;
       case 1:
-        return Icons.gamepad;
+        return IconData(0xea45, fontFamily: "GamePad");
       case 2:
         return Icons.flag;
       case 3:

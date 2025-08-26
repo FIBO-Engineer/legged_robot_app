@@ -4,9 +4,9 @@ import 'package:legged_robot_app/units/app_themes.dart';
 import 'route/routes.dart';
 import 'bindings/root_binding.dart';
 import 'package:toastification/toastification.dart';
-
 import 'units/app_colors.dart';
-//import 'dart:html' as html;
+// ignore: deprecated_member_use, avoid_web_libraries_in_flutter
+import 'dart:html' as html;
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,6 +16,8 @@ void main() {
     defaultOpaqueRoute: true,
     defaultPopGesture: false,
   );
+
+ html.document.onContextMenu.listen((event) => event.preventDefault());
   runApp(MyApp());
 }
 

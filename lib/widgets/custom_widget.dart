@@ -59,6 +59,7 @@ class CustomButton extends StatelessWidget {
   final Color backgroundColor;
   final Color foregroundColor;
   final double borderRadius;
+  final double height;
 
   const CustomButton({
     super.key,
@@ -68,28 +69,30 @@ class CustomButton extends StatelessWidget {
     this.backgroundColor = AppColors.card,
     this.foregroundColor = AppColors.grey,
     this.borderRadius = 12,
+    this.height = 46.0,
   });
 
   @override
   Widget build(BuildContext context) {
     return TextButton.icon(
-      icon: Icon(icon, color: foregroundColor, size: 20),
+      icon: Icon(icon, color: foregroundColor),
       label: Text(
         text,
         style: TextStyle(
           fontSize: 14,
           color: foregroundColor,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w500,
         ),
       ),
-      style: ElevatedButton.styleFrom(
+      style: TextButton.styleFrom(
         elevation: 2,
-        minimumSize: Size(0, 46),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         backgroundColor: backgroundColor,
         foregroundColor: foregroundColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(borderRadius),
         ),
+        minimumSize:  Size(0, height),
       ),
       onPressed: onPressed,
     );

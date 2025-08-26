@@ -21,7 +21,7 @@ class CameraView extends StatelessWidget {
         width: width ?? double.infinity,
         height: height ?? 300,
         decoration: BoxDecoration(
-          color: AppColors.scaffold,
+          color: AppColors.background,
           borderRadius: BorderRadius.circular(borderRadius),
         ),
         child: Stack(

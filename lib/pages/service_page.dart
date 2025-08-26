@@ -2,12 +2,15 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:toastification/toastification.dart';
 import '../controllers/main_conroller.dart';
 import '../controllers/management_controller.dart';
+import '../services/toast_service.dart';
 import '../units/app_colors.dart';
 import '../units/app_constants.dart';
 import '../widgets/app_navigation_bar.dart';
 import '../widgets/custom_dialog.dart';
+import '../widgets/custom_widget.dart';
 import '../widgets/dashed_painter.dart';
 
 class ServicePage extends StatelessWidget {
@@ -65,26 +68,27 @@ class ServiceScreen extends StatelessWidget {
     final MainController main = Get.find();
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      child: Obx(() {
-        final isFormOpen =
-            controller.addCard.value || controller.editCard.value;
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (isFormOpen) ...[
-              _addFormWidget(controller, theme),
-              const SizedBox(height: 20),
-            ] else ...[
-              const SizedBox(height: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
               Text('Management', style: theme.textTheme.titleLarge),
-              const SizedBox(height: 8),
-              _cardsGrid(controller, main, screen, theme),
+              CustomButton(
+                text: "Default",
+                icon: Icons.published_with_changes_rounded,
+                onPressed: () {
+                  controller.cards.value = controller.resetCards;
+                  controller.syncToStorage();
+                },
+              ),
             ],
-          ],
-        );
-      }),
+          ),
+          _cardsGrid(controller, main, screen, theme, context),
+        ],
+      ),
     );
   }
 
@@ -143,41 +147,53 @@ class ServiceScreen extends StatelessWidget {
     FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z0-9:./_-]')),
   ];
 
-  Widget _addFormWidget(ManagementController controller, ThemeData theme) {
-    final isEdit = controller.editCard.value;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: 12),
-        Align(
-          alignment: Alignment.topRight,
-          child: TextButton.icon(
-            icon: const Icon(
-              Icons.published_with_changes_rounded,
-              color: AppColors.grey,
+  void openAddFormDialog(
+    BuildContext context,
+    ManagementController controller,
+    ThemeData theme,
+  ) {
+    final maxW = Get.width < 550 ? Get.width - 48 : 550.0;
+    Get.dialog(
+      Dialog(
+        backgroundColor: AppColors.background,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: maxW,
+            maxHeight: MediaQuery.of(context).size.height * 0.9,
+          ),
+          child: Padding(
+            padding: EdgeInsets.only(
+              left: 16,
+              right: 16,
+              top: 16,
+              bottom: 16 + MediaQuery.of(context).viewInsets.bottom,
             ),
-            label: const Text(
-              "Default",
-              style: TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
+            child: SingleChildScrollView(
+              child: _addFormWidget(controller, theme),
             ),
-            style: TextButton.styleFrom(
-              elevation: 2,
-              backgroundColor: AppColors.card,
-              foregroundColor: AppColors.grey,
-              minimumSize: const Size(0, 46),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-                side: BorderSide(color: AppColors.grey, width: 1.2),
-              ),
-            ),
-            onPressed: () {
-              controller.cards.value = controller.resetCards;
-              controller.syncToStorage();
-            },
           ),
         ),
-        const SizedBox(height: 12),
+      ),
+      barrierDismissible: false,
+    );
+  }
+
+  Widget _addFormWidget(ManagementController controller, ThemeData theme) {
+    final isEdit = controller.editCard.value;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Text(
+          isEdit ? 'Edit Service' : 'New Service',
+          style: TextStyle(
+            color: isEdit ? AppColors.orange : AppColors.primary,
+            fontWeight: FontWeight.w600,
+            fontSize: 18,
+          ),
+        ),
+        const SizedBox(height: 16),
         Row(
           children: [
             Expanded(
@@ -213,53 +229,57 @@ class ServiceScreen extends StatelessWidget {
             children: [
               Text('Arguments', style: theme.textTheme.titleMedium),
               const SizedBox(height: 12),
-              SizedBox(
-                height: 100,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: ListView.separated(
-                        primary: false,
-                        shrinkWrap: true,
-                        physics: const ClampingScrollPhysics(),
-                        itemCount: controller.args.value,
-                        separatorBuilder: (_, __) => const SizedBox(height: 10),
-                        itemBuilder:
-                            (_, i) => TextField(
-                              maxLines: null,
-                              keyboardType: TextInputType.multiline,
-                              controller: controller.textControllerArgs[i],
-                              decoration: InputDecoration(
-                                labelText: "Arg ${i + 1}",
-                                fillColor: AppColors.background,
-                                hoverColor: AppColors.card,
+              Obx(
+                () => SizedBox(
+                  height: 100,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: ListView.separated(
+                          primary: false,
+                          shrinkWrap: true,
+                          physics: const ClampingScrollPhysics(),
+                          itemCount: controller.args.value,
+                          separatorBuilder:
+                              (_, __) => const SizedBox(height: 10),
+                          itemBuilder:
+                              (_, i) => TextField(
+                                maxLines: null,
+                                keyboardType: TextInputType.multiline,
+                                controller: controller.textControllerArgs[i],
+                                decoration: InputDecoration(
+                                  labelText: "Arg ${i + 1}",
+                                  fillColor: AppColors.background,
+                                  hoverColor: AppColors.card,
+                                ),
                               ),
-                            ),
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: ListView.separated(
-                        primary: false,
-                        shrinkWrap: true,
-                        physics: const ClampingScrollPhysics(),
-                        itemCount: controller.data.value,
-                        separatorBuilder: (_, __) => const SizedBox(height: 10),
-                        itemBuilder:
-                            (_, i) => TextField(
-                              maxLines: null,
-                              keyboardType: TextInputType.multiline,
-                              controller: controller.textControllerData[i],
-                              decoration: InputDecoration(
-                                labelText: "Data ${i + 1}",
-                                fillColor: AppColors.background,
-                                hoverColor: AppColors.card,
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ListView.separated(
+                          primary: false,
+                          shrinkWrap: true,
+                          physics: const ClampingScrollPhysics(),
+                          itemCount: controller.data.value,
+                          separatorBuilder:
+                              (_, __) => const SizedBox(height: 10),
+                          itemBuilder:
+                              (_, i) => TextField(
+                                maxLines: null,
+                                keyboardType: TextInputType.multiline,
+                                controller: controller.textControllerData[i],
+                                decoration: InputDecoration(
+                                  labelText: "Data ${i + 1}",
+                                  fillColor: AppColors.background,
+                                  hoverColor: AppColors.card,
+                                ),
                               ),
-                            ),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: 6),
@@ -267,185 +287,88 @@ class ServiceScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   IconButton(
+                    icon: const Icon(Icons.remove_circle, color: AppColors.red),
                     onPressed: () {
                       if (controller.args.value > 1) {
                         controller.args.value--;
                         controller.data.value--;
-                        if (controller.textControllerArgs.isNotEmpty) {
-                          controller.textControllerArgs.removeLast();
-                        }
-                        if (controller.textControllerData.isNotEmpty) {
-                          controller.textControllerData.removeLast();
-                        }
+                        _ensureArgControllers(
+                          controller,
+                          controller.args.value,
+                        );
                       }
                     },
-                    icon: const Icon(Icons.remove_circle, color: AppColors.red),
                   ),
                   IconButton(
+                    icon: const Icon(Icons.add_circle, color: AppColors.green),
                     onPressed: () {
                       if (controller.args.value < 10) {
                         controller.args.value++;
                         controller.data.value++;
-                        controller.textControllerArgs.add(
-                          TextEditingController(),
-                        );
-                        controller.textControllerData.add(
-                          TextEditingController(),
+                        _ensureArgControllers(
+                          controller,
+                          controller.args.value,
                         );
                       }
                     },
-                    icon: const Icon(Icons.add_circle, color: AppColors.green),
                   ),
                 ],
               ),
             ],
           ),
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 12),
         Row(
           children: [
             Expanded(
-              child: TextButton.icon(
-                icon: const Icon(Icons.clear_rounded, color: AppColors.grey),
-                label: const Text(
-                  "Cancel",
-                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
-                ),
-                style: TextButton.styleFrom(
-                  elevation: 2,
-                  backgroundColor: AppColors.card,
-                  foregroundColor: AppColors.grey,
-                  minimumSize: const Size(double.infinity, 54),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
+              child: CustomButton(
+                text: "Cancel",
+                icon: Icons.clear_rounded,
+                foregroundColor: AppColors.grey,
                 onPressed: () {
                   controller.addCard.value = false;
                   controller.editCard.value = false;
                   controller.clearFormat();
+                  Get.back();
                 },
               ),
             ),
-            if (controller.editCard.value) const SizedBox(width: 12),
-            if (controller.editCard.value)
-              Expanded(
-                child: TextButton.icon(
-                  icon: const Icon(Icons.delete_rounded, color: AppColors.red),
-                  label: const Text(
-                    "Delete",
-                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
-                  ),
-                  style: TextButton.styleFrom(
-                    elevation: 2,
-                    backgroundColor: AppColors.card,
-                    foregroundColor: AppColors.red,
-                    minimumSize: const Size(double.infinity, 54),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  onPressed: () {
-                    showCustomDialog(
-                      title: 'Delete',
-                      message: 'Are you sure you want to delete?',
-                      color: AppColors.red,
-                      icon: Icons.delete_rounded,
-                      onConfirm: () {
-                        controller.cards.removeAt(controller.index.value);
-                        controller.syncToStorage();
-                        controller.clearFormat();
-                        Get.back();
-                        controller.editCard.value = false;
-                      },
-                    );
-                  },
-                ),
-              ),
+
             const SizedBox(width: 12),
             Expanded(
-              child: TextButton.icon(
-                icon: Icon(
-                  isEdit ? Icons.save_as_rounded : Icons.save_rounded,
-                  color: isEdit ? AppColors.orange : AppColors.green,
-                ),
-                label: Text(
-                  isEdit ? 'Update' : 'Save',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                  ),
-                ),
-                style: TextButton.styleFrom(
-                  elevation: 2,
-                  backgroundColor: AppColors.card,
-                  foregroundColor: isEdit ? AppColors.orange : AppColors.green,
-                  minimumSize: const Size(double.infinity, 54),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
+              child: CustomButton(
+                text: isEdit ? 'Update' : 'Save',
+                icon: isEdit ? Icons.save_as_rounded : Icons.save_rounded,
+                foregroundColor: isEdit ? AppColors.orange : AppColors.green,
                 onPressed: () {
                   if (controller.labelTextField.value.text.isEmpty ||
                       controller.serviceTextField.value.text.isEmpty) {
-                    Get.dialog(
-                      AlertDialog(
-                        backgroundColor: AppColors.background,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        actionsPadding: const EdgeInsets.all(16),
-                        title: const Text(
-                          'Invalid',
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                        content: const Text(
-                          'Please fill in all fields.',
-                          style: TextStyle(color: AppColors.grey, fontSize: 16),
-                        ),
-                        actions: [
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              minimumSize: const Size(0, 46),
-                              backgroundColor: AppColors.scaffold,
-                              foregroundColor: AppColors.grey,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(28),
-                                side: BorderSide(
-                                  color: AppColors.grey,
-                                  width: 1.2,
-                                ),
-                              ),
-                            ),
-                            child: Text(
-                              'Close',
-                              style: TextStyle(fontWeight: FontWeight.w600),
-                            ),
-                            onPressed: () => Get.back(),
-                          ),
-                        ],
-                      ),
+                    ToastService.showToast(
+                      title: 'Invalid',
+                      description: 'Please fill in all fields.',
+                      type: ToastificationType.warning,
                     );
+
                     return;
                   }
 
                   final result = <String, dynamic>{};
-                  for (
-                    var i = 0;
-                    i < controller.textControllerArgs.length;
-                    i++
-                  ) {
-                    final k = controller.textControllerArgs[i].text;
-                    final v = controller.textControllerData[i].text;
-                    if (k.trim().isEmpty) continue;
+                  for (var i = 0; i < controller.args.value; i++) {
+                    final k = controller.textControllerArgs[i].text.trim();
+                    final v = controller.textControllerData[i].text.trim();
+                    if (k.isEmpty) continue;
+                    if (result.containsKey(k)) {
+                      ToastService.showToast(
+                        title: 'Duplicate key',
+                        description: 'Argument "$k" duplicated.',
+                        type: ToastificationType.warning,
+                      );
+                      return;
+                    }
                     result[k] =
-                        v.toLowerCase() == 'true'
+                        (v.toLowerCase() == 'true')
                             ? true
-                            : v.toLowerCase() == 'false'
+                            : (v.toLowerCase() == 'false')
                             ? false
                             : v;
                   }
@@ -477,43 +400,45 @@ class ServiceScreen extends StatelessWidget {
 
                   controller.clearFormat();
                   controller.syncToStorage();
+                  Get.back();
                 },
               ),
             ),
           ],
         ),
-        const SizedBox(height: 8),
       ],
     );
   }
 
-  Widget _newCardTile(ManagementController controller, ThemeData theme) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: () {
-          controller.clearFormat();
-          controller.addCard.value = true;
-          controller.isPublish.value = false;
-          controller.editCard.value = false;
-        },
-        child: CustomPaint(
-          foregroundPainter: DashedPainter(color: AppColors.grey),
-          child: Container(
-            decoration: BoxDecoration(
-              color: AppColors.background,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            alignment: Alignment.center,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.add_rounded, color: Colors.white, size: 20),
-                SizedBox(width: 8),
-                Text('New', style: theme.textTheme.labelMedium),
-              ],
-            ),
+  Widget _newCard(
+    BuildContext context,
+    ManagementController controller,
+    ThemeData theme,
+  ) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(16),
+      onTap: () {
+        controller.clearFormat();
+        controller.addCard.value = true;
+        controller.isPublish.value = false;
+        controller.editCard.value = false;
+        openAddFormDialog(context, controller, theme);
+      },
+      child: CustomPaint(
+        foregroundPainter: DashedPainter(color: AppColors.grey),
+        child: Container(
+          decoration: BoxDecoration(
+            color: AppColors.background,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          alignment: Alignment.center,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.add_rounded, color: Colors.white, size: 20),
+              SizedBox(width: 8),
+              Text('New', style: theme.textTheme.labelMedium),
+            ],
           ),
         ),
       ),
@@ -525,6 +450,7 @@ class ServiceScreen extends StatelessWidget {
     MainController main,
     ScreenSize screen,
     ThemeData theme,
+    BuildContext context,
   ) {
     return Obx(
       () => GridView.builder(
@@ -540,25 +466,30 @@ class ServiceScreen extends StatelessWidget {
         itemCount: controller.cards.length + 1,
         itemBuilder: (_, index) {
           if (index == controller.cards.length) {
-            return _newCardTile(controller, theme);
+            return _newCard(context, controller, theme);
           }
 
           final cardIndex = index;
           final card = controller.cards[cardIndex];
 
           return InkWell(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(16),
             onTap: () {
+              final bool cardPublish =
+                  (card['isPublish'] == true) ||
+                  (card['isPublish'] is String &&
+                      card['isPublish'].toLowerCase() == 'true');
+
               Map argsMap = {};
               if (card['args'] is Map && (card['args'] as Map).isNotEmpty) {
                 argsMap = controller.convertStringBools(card['args']);
               }
+
               final payload = {
-                "op": controller.isPublish.value ? "publish" : "call_service",
-                controller.isPublish.value ? "topic" : "service":
-                    card['service'],
+                "op": cardPublish ? "publish" : "call_service",
+                (cardPublish ? "topic" : "service"): card['service'],
                 if (argsMap.isNotEmpty)
-                  (controller.isPublish.value ? "msg" : "args"):
+                  (cardPublish ? "msg" : "args"):
                       (card['service'] == '/speak'
                           ? {
                             "text": argsMap['text'],
@@ -567,8 +498,10 @@ class ServiceScreen extends StatelessWidget {
                           }
                           : argsMap),
               };
+
               main.sendData(jsonEncode(payload));
             },
+
             onLongPress: () {
               controller.editCard.value = true;
               controller.addCard.value = false;
@@ -597,6 +530,22 @@ class ServiceScreen extends StatelessWidget {
                   TextEditingController(text: v.toString()),
                 );
               });
+
+              openAddFormDialog(context, controller, theme);
+            },
+            onDoubleTap: () {
+              showCustomDialog(
+                title: 'Delete',
+                message: 'Are you sure you want to delete?',
+                color: AppColors.red,
+                icon: Icons.delete_rounded,
+                onConfirm: () {
+                  controller.cards.removeAt(cardIndex);
+                  controller.syncToStorage();
+                  controller.clearFormat();
+                  Get.back();
+                },
+              );
             },
             child: Container(
               decoration: BoxDecoration(
@@ -624,5 +573,20 @@ class ServiceScreen extends StatelessWidget {
         },
       ),
     );
+  }
+
+  void _ensureArgControllers(ManagementController c, int count) {
+    while (c.textControllerArgs.length < count) {
+      c.textControllerArgs.add(TextEditingController());
+    }
+    while (c.textControllerData.length < count) {
+      c.textControllerData.add(TextEditingController());
+    }
+    while (c.textControllerArgs.length > count) {
+      c.textControllerArgs.removeLast().dispose();
+    }
+    while (c.textControllerData.length > count) {
+      c.textControllerData.removeLast().dispose();
+    }
   }
 }
