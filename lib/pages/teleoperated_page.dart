@@ -151,7 +151,9 @@ class TeleoperatedScreen extends StatelessWidget {
         icon: Icons.gamepad_rounded,
         backgroundColor: AppColors.card,
         iconColor: controller.showJoy.value ? AppColors.primary : Colors.white,
-        onPressed: controller.toggleJoy,
+        onPressed:(){
+          controller.showJoy.value = !controller.showJoy.value;
+        },
       ),
     );
   }

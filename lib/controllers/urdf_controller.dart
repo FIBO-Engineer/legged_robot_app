@@ -209,7 +209,7 @@ class UrdfController extends GetxController {
       }
 
       // สร้าง highlight material
-      final highlightMaterial = three.MeshPhongMaterial.fromMap({'color': 0xFF3BEB, 'transparent': false, 'shininess': 30, 'specular': 0x111111});
+      final highlightMaterial = three.MeshPhongMaterial.fromMap({'color': 0xFF171F2B, 'transparent': false, 'shininess': 30, 'specular': 0x111111});
 
       // เปลี่ยน material
       childLink.mesh!.material = highlightMaterial;

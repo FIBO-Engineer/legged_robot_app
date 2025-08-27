@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-
 import '../../controllers/main_conroller.dart';
 import '../../controllers/urdf_controller.dart';
 import '../../units/app_colors.dart';
@@ -38,8 +37,7 @@ class JointControlPanel extends StatelessWidget {
           children: [
             CustomButton(
               text: 'Free',
-              foregroundColor: Colors.white,
-              backgroundColor: AppColors.primary,
+              foregroundColor: AppColors.primary,
               icon: Icons.lock_reset,
               onPressed: () {
                 Map data = {
@@ -53,8 +51,7 @@ class JointControlPanel extends StatelessWidget {
             ),
             CustomButton(
               text: 'Lock',
-              foregroundColor: Colors.white,
-              backgroundColor: AppColors.red,
+              foregroundColor: AppColors.red,
               icon: Icons.lock,
               onPressed: () {
                 Map data = {
@@ -91,8 +88,7 @@ class JointControlPanel extends StatelessWidget {
             if (!screen.isPortrait)
               CustomButton(
                 text: 'Save',
-                foregroundColor: Colors.white,
-                backgroundColor: AppColors.green,
+                foregroundColor: AppColors.green,
                 icon: Icons.save_rounded,
                 onPressed: () {
                   _showSaveDialog(context, mainController);
@@ -100,9 +96,8 @@ class JointControlPanel extends StatelessWidget {
               ),
           ],
         ),
+        if (screen.isPortrait) SizedBox(height: 6),
         if (screen.isPortrait)
-        SizedBox(height: 6),
-          if (screen.isPortrait)
           ElevatedButton.icon(
             onPressed: () {
               _showSaveDialog(context, mainController);

@@ -122,7 +122,7 @@ class ServiceScreen extends StatelessWidget {
                   label: Text(
                     topic,
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 12,
                       color: isSelected ? Colors.white : AppColors.grey,
                       fontWeight: FontWeight.w500,
                     ),

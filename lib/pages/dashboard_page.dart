@@ -245,7 +245,9 @@ class DashboardScreen extends StatelessWidget {
                         controller.showLayer.value
                             ? AppColors.primary
                             : AppColors.grey,
-                    onPressed: controller.toggleLayer,
+                    onPressed: () {
+                      controller.showLayer.value = !controller.showLayer.value;
+                    },
                     tooltip: '', //Layer control
                   ),
                 ),
@@ -265,7 +267,10 @@ class DashboardScreen extends StatelessWidget {
                                       controller.showGlobalCostmap.value
                                           ? AppColors.primary
                                           : AppColors.grey,
-                                  onPressed: controller.toggleGlobalCostmap,
+                                  onPressed: () {
+                                    controller.showGlobalCostmap.value =
+                                        !controller.showGlobalCostmap.value;
+                                  },
                                   tooltip: '', //Global map
                                 ),
                               ),
@@ -279,7 +284,10 @@ class DashboardScreen extends StatelessWidget {
                                       controller.showLocalCostmap.value
                                           ? AppColors.primary
                                           : AppColors.grey,
-                                  onPressed: controller.toggleLocalCostmap,
+                                  onPressed: () {
+                                    controller.showLocalCostmap.value =
+                                        !controller.showLocalCostmap.value;
+                                  },
                                   tooltip: '', //Local map
                                 ),
                               ),
@@ -293,7 +301,10 @@ class DashboardScreen extends StatelessWidget {
                                       controller.showLaser.value
                                           ? AppColors.primary
                                           : AppColors.grey,
-                                  onPressed: controller.toggleLaser,
+                                  onPressed: () {
+                                    controller.showLaser.value =
+                                        !controller.showLaser.value;
+                                  },
                                   tooltip: '', //Laser
                                 ),
                               ),
@@ -307,8 +318,10 @@ class DashboardScreen extends StatelessWidget {
                                       controller.showPointCloud.value
                                           ? AppColors.primary
                                           : AppColors.grey,
-                                  onPressed: controller.togglePointCloud,
-                                  tooltip: '', //Point cloud
+                                  onPressed: () {
+                                    controller.showPointCloud.value =
+                                        !controller.showPointCloud.value;
+                                  },
                                 ),
                               ),
                             ],
@@ -339,7 +352,10 @@ class DashboardScreen extends StatelessWidget {
                         controller.showRelocation.value
                             ? AppColors.primary
                             : AppColors.grey,
-                    onPressed: controller.toggleRelocation,
+                    onPressed: () {
+                      controller.showRelocation.value =
+                          !controller.showRelocation.value;
+                    },
                     tooltip: '',
                   ),
                 ),
@@ -382,7 +398,9 @@ class DashboardScreen extends StatelessWidget {
                 controller.showCamera.value
                     ? AppColors.primary
                     : AppColors.grey,
-            onPressed: controller.toggleCamera,
+            onPressed: () {
+              controller.showCamera.value = !controller.showCamera.value;
+            },
           ),
         ),
       ],

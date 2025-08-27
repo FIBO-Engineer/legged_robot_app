@@ -67,6 +67,7 @@ class MainController extends GetxController {
         // "robot_mover/set_continuous_movement",
         // "robot_mover/set_continuous_movement_test_in_fibonaci",
       ].obs;
+
   RxBool isHide = false.obs;
   RxInt speedLevel = 0.obs;
 
@@ -98,7 +99,10 @@ class MainController extends GetxController {
   var showPointCloud = false.obs;
   RxBool showRelocation = false.obs;
   RxBool showCamera = true.obs;
+
   RxBool showJoy = true.obs;
+  RxBool showControlOverlay = true.obs;
+  RxBool showRobotModel = true.obs;
 
   @override
   void onInit() async {
@@ -622,37 +626,6 @@ class MainController extends GetxController {
   }
 
   /*------------------------------ Others--------------------------------------*/
-  void toggleLayer() {
-    showLayer.value = !showLayer.value;
-  }
-
-  void toggleGlobalCostmap() {
-    showGlobalCostmap.value = !showGlobalCostmap.value;
-  }
-
-  void toggleLocalCostmap() {
-    showLocalCostmap.value = !showLocalCostmap.value;
-  }
-
-  void toggleLaser() {
-    showLaser.value = !showLaser.value;
-  }
-
-  void togglePointCloud() {
-    showPointCloud.value = !showPointCloud.value;
-  }
-
-  void toggleRelocation() {
-    showRelocation.value = !showRelocation.value;
-  }
-
-  void toggleCamera() {
-    showCamera.value = !showCamera.value;
-  }
-
-  void toggleJoy() {
-    showJoy.value = !showJoy.value;
-  }
 
   RxDouble mapResolution = 0.05.obs;
   double get pxPerMeter => 1.0 / mapResolution.value;

@@ -40,7 +40,7 @@ class _SidebarNavigation extends StatelessWidget {
   const _SidebarNavigation({required this.selectedIndex, required this.onTap});
   @override
   Widget build(BuildContext context) {
-    return  Container(
+    return Container(
       width: 56,
       color: AppColors.scaffold,
       padding: const EdgeInsets.symmetric(vertical: 16),
@@ -58,14 +58,15 @@ class _SidebarNavigation extends StatelessWidget {
               ),
               SizedBox(height: 12),
               _NavIcon(
-                icon: IconData(0xea45, fontFamily: "GamePad"),
+                // icon: IconData(0xea45, fontFamily: "GamePad"),
+                icon: Icons.manage_accounts_outlined,
                 size: 20,
                 selected: selectedIndex == 1,
                 onTap: () => onTap(1),
               ),
               SizedBox(height: 12),
               _NavIcon(
-                icon: Icons.flag_outlined,
+                icon: Icons.ads_click_rounded,
                 size: 20,
                 selected: selectedIndex == 2,
                 onTap: () => onTap(2),
@@ -79,7 +80,7 @@ class _SidebarNavigation extends StatelessWidget {
               ),
               SizedBox(height: 12),
               _NavIcon(
-                icon: Icons.engineering_outlined,
+                icon: Icons.local_mall_outlined,
                 size: 20,
                 selected: selectedIndex == 4,
                 onTap: () => onTap(4),
@@ -113,11 +114,15 @@ class _BottomNavigation extends StatelessWidget {
           label: '',
         ),
         BottomNavigationBarItem(
-          icon: Icon(IconData(0xea45, fontFamily: "GamePad"), size: 20),
+          icon: Icon(
+            //IconData(0xea45, fontFamily: "GamePad")
+            Icons.manage_accounts_outlined,
+            size: 20,
+          ),
           label: '',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.flag_outlined, size: 20),
+          icon: Icon(Icons.ads_click_rounded, size: 20),
           label: '',
         ),
         BottomNavigationBarItem(
@@ -125,7 +130,7 @@ class _BottomNavigation extends StatelessWidget {
           label: '',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.engineering_outlined, size: 20),
+          icon: Icon(Icons.local_mall_outlined, size: 20),
           label: '',
         ),
       ],
@@ -161,7 +166,8 @@ class _FloatingNavigation extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             decoration: BoxDecoration(
-              color: AppColors.scaffold,
+              // ignore: deprecated_member_use
+              color: AppColors.scaffold.withOpacity(0.9),
               borderRadius: BorderRadius.circular(28),
             ),
             child: Row(
@@ -170,13 +176,17 @@ class _FloatingNavigation extends StatelessWidget {
                 if (isExpanded) ...[
                   _navButton(0, Icons.dashboard_outlined),
                   _spacer(),
-                  _navButton(1, IconData(0xea45, fontFamily: "GamePad")),
+                  _navButton(
+                    1,
+                    //IconData(0xea45, fontFamily: "GamePad")
+                    Icons.manage_accounts_outlined,
+                  ),
                   _spacer(),
-                  _navButton(2, Icons.flag_outlined),
+                  _navButton(2, Icons.ads_click_rounded),
                   _spacer(),
                   _navButton(3, Icons.settings_outlined),
                   _spacer(),
-                  _navButton(4, Icons.engineering_outlined),
+                  _navButton(4, Icons.local_mall_outlined),
                 ] else ...[
                   _navButton(selectedIndex, _iconForIndex(selectedIndex)),
                 ],

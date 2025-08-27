@@ -6,7 +6,7 @@ import 'bindings/root_binding.dart';
 import 'package:toastification/toastification.dart';
 import 'units/app_colors.dart';
 // ignore: deprecated_member_use, avoid_web_libraries_in_flutter
-import 'dart:html' as html;
+// import 'dart:html' as html;
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,7 +17,7 @@ void main() {
     defaultPopGesture: false,
   );
 
- html.document.onContextMenu.listen((event) => event.preventDefault());
+  // html.document.onContextMenu.listen((event) => event.preventDefault());
   runApp(MyApp());
 }
 

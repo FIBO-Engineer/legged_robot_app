@@ -27,13 +27,7 @@ class CircleButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 2,
-      color: AppColors.scaffold,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(borderRadius),
-      ),
-      child: Container(
+    return  Container(
         width: size,
         height: size,
         decoration: BoxDecoration(
@@ -47,7 +41,7 @@ class CircleButton extends StatelessWidget {
           onPressed: onPressed,
           tooltip: tooltip,
         ),
-      ),
+      
     );
   }
 }
@@ -81,7 +75,7 @@ class CustomButton extends StatelessWidget {
         style: TextStyle(
           fontSize: 14,
           color: foregroundColor,
-          fontWeight: FontWeight.w500,
+          fontWeight: FontWeight.w600,
         ),
       ),
       style: TextButton.styleFrom(
@@ -92,7 +86,7 @@ class CustomButton extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(borderRadius),
         ),
-        minimumSize:  Size(0, height),
+        minimumSize: Size(0, height),
       ),
       onPressed: onPressed,
     );

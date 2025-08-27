@@ -76,7 +76,7 @@ class CustomDialog extends StatelessWidget {
                             backgroundColor: AppColors.scaffold,
                             foregroundColor: color,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(28),
+                              borderRadius: BorderRadius.circular(12),
                               side: BorderSide(color: color, width: 1.2),
                             ),
                           ),
@@ -92,6 +92,10 @@ class CustomDialog extends StatelessWidget {
                             minimumSize: const Size(0, 46),
                             backgroundColor: color,
                             foregroundColor: AppColors.background,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              side: BorderSide(color: color, width: 1.2),
+                            ),
                           ),
                           child: Text(
                             'Confirm',

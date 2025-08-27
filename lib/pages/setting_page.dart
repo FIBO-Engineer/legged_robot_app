@@ -132,7 +132,7 @@ class SettingScreen extends StatelessWidget {
                       ? AppColors.green
                       : AppColors.red,
               fontWeight: FontWeight.w600,
-              fontSize: 16,
+              fontSize: 14,
             ),
           ),
         ),
@@ -176,7 +176,7 @@ class SettingScreen extends StatelessWidget {
               label: Text(
                 p.robotType,
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 12,
                   color: isSelected ? Colors.white : AppColors.grey,
                   fontWeight: FontWeight.w500,
                 ),
