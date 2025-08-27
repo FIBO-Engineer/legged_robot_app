@@ -22,13 +22,13 @@ TextTheme textTheme() {
       overflow: TextOverflow.ellipsis,
     ),
     titleLarge: TextStyle(
-      fontSize: 18,
+      fontSize: 16,
       fontWeight: FontWeight.w500,
       color: Colors.white,
       overflow: TextOverflow.ellipsis,
     ),
     titleMedium: TextStyle(
-      fontSize: 16,
+      fontSize: 14,
       fontWeight: FontWeight.w400,
       color: Colors.white,
       overflow: TextOverflow.ellipsis,

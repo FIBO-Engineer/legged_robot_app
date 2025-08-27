@@ -21,3 +21,6 @@ class ScreenSize {
           MediaQuery.of(context).size.height >
           MediaQuery.of(context).size.width;
 }
+class AppIcons {
+  static const IconData gamePad = IconData(0xea45, fontFamily: 'GamePad');
+}

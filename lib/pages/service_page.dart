@@ -183,6 +183,7 @@ class ServiceScreen extends StatelessWidget {
   Widget _addFormWidget(ManagementController controller, ThemeData theme) {
     final isEdit = controller.editCard.value;
     return Column(
+      spacing: 12,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Text(
@@ -190,11 +191,11 @@ class ServiceScreen extends StatelessWidget {
           style: TextStyle(
             color: isEdit ? AppColors.orange : AppColors.primary,
             fontWeight: FontWeight.w600,
-            fontSize: 18,
+            fontSize: 16,
           ),
         ),
-        const SizedBox(height: 16),
         Row(
+          spacing: 8,
           children: [
             Expanded(
               child: TextField(
@@ -203,20 +204,17 @@ class ServiceScreen extends StatelessWidget {
                 inputFormatters: inputFormatter,
               ),
             ),
-            const SizedBox(width: 12),
             Align(
               alignment: Alignment.centerRight,
               child: topicSelector(controller),
             ),
           ],
         ),
-        const SizedBox(height: 12),
         TextField(
           controller: controller.serviceTextField.value,
           decoration: const InputDecoration(labelText: "Service"),
           inputFormatters: inputFormatter,
         ),
-        const SizedBox(height: 12),
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
@@ -225,14 +223,16 @@ class ServiceScreen extends StatelessWidget {
             border: Border.all(color: AppColors.background, width: 1.2),
           ),
           child: Column(
+            spacing: 8,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text('Arguments', style: theme.textTheme.titleMedium),
-              const SizedBox(height: 12),
+
               Obx(
                 () => SizedBox(
                   height: 100,
                   child: Row(
+                    spacing: 8,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
@@ -256,7 +256,6 @@ class ServiceScreen extends StatelessWidget {
                               ),
                         ),
                       ),
-                      const SizedBox(width: 12),
                       Expanded(
                         child: ListView.separated(
                           primary: false,
@@ -282,7 +281,6 @@ class ServiceScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 6),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -317,8 +315,8 @@ class ServiceScreen extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: 12),
         Row(
+          spacing: 8,
           children: [
             Expanded(
               child: CustomButton(
@@ -333,8 +331,6 @@ class ServiceScreen extends StatelessWidget {
                 },
               ),
             ),
-
-            const SizedBox(width: 12),
             Expanded(
               child: CustomButton(
                 text: isEdit ? 'Update' : 'Save',
@@ -433,10 +429,11 @@ class ServiceScreen extends StatelessWidget {
           ),
           alignment: Alignment.center,
           child: Row(
+            spacing: 8,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(Icons.add_rounded, color: Colors.white, size: 20),
-              SizedBox(width: 8),
+
               Text('New', style: theme.textTheme.labelMedium),
             ],
           ),

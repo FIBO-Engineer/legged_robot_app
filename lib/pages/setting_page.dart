@@ -77,12 +77,12 @@ class SettingScreen extends StatelessWidget {
             title: 'Basic Setting',
             child: _BasicSetting(controller: controller, screen: screen),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
           _Section(
             title: 'Motion Control',
             child: _MotionControl(controller: controller, screen: screen),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           Align(
             alignment: Alignment.centerRight,
             child: Wrap(
@@ -211,7 +211,7 @@ class _Section extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(title, style: theme.textTheme.titleMedium),
-        const SizedBox(height: 12),
+        const SizedBox(height: 8),
         child,
       ],
     );
@@ -243,15 +243,15 @@ class _BasicSetting extends StatelessWidget {
     return Obx(() {
       if (screen.isPortrait) {
         return Column(
+          spacing: 8,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             tf(
               controller: controller.ipWebSocket.value,
               label: 'Websocket Address',
             ),
-            const SizedBox(height: 12),
             tf(controller: controller.ipCamera.value, label: 'Camera Address'),
-            const SizedBox(height: 12),
+
             Obx(
               () => CustomButton(
                 text: controller.disconnect.value ? 'Connect' : 'Disconnect',
@@ -276,6 +276,7 @@ class _BasicSetting extends StatelessWidget {
         );
       }
       return Row(
+        spacing: 8,
         children: [
           Expanded(
             flex: 3,
@@ -284,7 +285,6 @@ class _BasicSetting extends StatelessWidget {
               label: 'Websocket Address',
             ),
           ),
-          const SizedBox(width: 12),
           Expanded(
             flex: 4,
             child: tf(
@@ -292,19 +292,36 @@ class _BasicSetting extends StatelessWidget {
               label: 'Camera Address',
             ),
           ),
-          const SizedBox(width: 12),
-
           Obx(
-            () => CustomButton(
-              text: controller.disconnect.value ? 'Connect' : 'Disconnect',
-              icon:
-                  !controller.disconnect.value
-                      ? Icons.link_off_rounded
-                      : Icons.link_rounded,
-              foregroundColor:
-                  !controller.disconnect.value
-                      ? AppColors.red
-                      : AppColors.primary,
+            () => TextButton.icon(
+              icon: Icon(
+                !controller.disconnect.value
+                    ? Icons.link_off_rounded
+                    : Icons.link_rounded,
+                color:
+                    !controller.disconnect.value
+                        ? AppColors.red
+                        : AppColors.primary,
+              ),
+              label: Text(
+                controller.disconnect.value ? 'Connect' : 'Disconnect',
+                style: TextStyle(
+                  fontSize: 14,
+                  color:
+                      !controller.disconnect.value
+                          ? AppColors.red
+                          : AppColors.primary,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              style: TextButton.styleFrom(
+                backgroundColor: AppColors.card,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                minimumSize: const Size(0, 56),
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+              ),
               onPressed: () {
                 if (controller.disconnect.value) {
                   controller.connectRobot();
@@ -330,7 +347,7 @@ class _MotionControl extends StatelessWidget {
     Widget tile(String label, RxDouble v) {
       return Obx(
         () => Container(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
           decoration: BoxDecoration(
             color: AppColors.scaffold,
             borderRadius: BorderRadius.circular(12),
@@ -339,7 +356,7 @@ class _MotionControl extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.only(left: 8),
+                padding: const EdgeInsets.only(left: 10),
                 child: Text(
                   label,
                   style: Theme.of(context).textTheme.titleSmall,
@@ -350,27 +367,31 @@ class _MotionControl extends StatelessWidget {
                   Expanded(
                     child: SliderTheme(
                       data: SliderTheme.of(context).copyWith(
-                        trackShape: const RoundedRectSliderTrackShape(),
+                        activeTrackColor: AppColors.grey,
+                        // ignore: deprecated_member_use
+                        inactiveTrackColor: AppColors.grey.withOpacity(0.25),
+                        thumbColor: AppColors.grey,
+                        // ignore: deprecated_member_use
+                        overlayColor: AppColors.grey.withOpacity(0.2),
                         trackHeight: 3,
                         thumbShape: const RoundSliderThumbShape(
-                          enabledThumbRadius: 8,
+                          enabledThumbRadius: 6,
                         ),
-                        overlayShape: SliderComponentShape.noOverlay,
+                        overlayShape: const RoundSliderOverlayShape(
+                          overlayRadius: 12,
+                        ),
                       ),
                       child: Slider(
                         value: v.value,
                         onChanged: (val) => v.value = val,
                         min: 0,
                         max: 1,
-                        activeColor: Colors.blue,
-                        inactiveColor: AppColors.grey,
                       ),
                     ),
                   ),
-                  const SizedBox(width: 8),
                   Text(
                     v.value.toStringAsFixed(1),
-                    style: Theme.of(context).textTheme.titleLarge,
+                    style: Theme.of(context).textTheme.titleMedium,
                   ),
                   const SizedBox(width: 4),
                 ],
@@ -383,23 +404,21 @@ class _MotionControl extends StatelessWidget {
 
     if (screen.isPortrait) {
       return Column(
+        spacing: 8,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           tile('Linear Speed', controller.linearSpeed),
-          const SizedBox(height: 12),
           tile('Angular Speed', controller.angularSpeed),
-          const SizedBox(height: 12),
           tile('Sampling Rate', controller.samplingRate),
         ],
       );
     }
 
     return Row(
+      spacing: 8,
       children: [
         Expanded(child: tile('Linear Speed', controller.linearSpeed)),
-        const SizedBox(width: 12),
         Expanded(child: tile('Angular Speed', controller.angularSpeed)),
-        const SizedBox(width: 12),
         Expanded(child: tile('Sampling Rate', controller.samplingRate)),
       ],
     );

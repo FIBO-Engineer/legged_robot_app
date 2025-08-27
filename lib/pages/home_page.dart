@@ -64,7 +64,7 @@ class HomeScreen extends StatelessWidget {
       if (screen.isDesktop || screen.isTablet) {
         return Stack(
           children: [
-            const Positioned.fill(child: CameraView()),
+           // const Positioned.fill(child: CameraView()),
             if (showRobotModel) const RobotModelView(),
             if (showControlOverlay) const ControlOverlay(),
             if (showJoy) ...[
@@ -90,7 +90,7 @@ class HomeScreen extends StatelessWidget {
       } else if (screen.isPortrait) {
         return Stack(
           children: [
-            const Positioned.fill(child: CameraView()),
+          //  const Positioned.fill(child: CameraView()),
             if (showRobotModel) const RobotModelView(),
             if (showControlOverlay) const ControlOverlay(),
             if (showJoy) ...[
@@ -124,7 +124,7 @@ class HomeScreen extends StatelessWidget {
         return Stack(
           alignment: AlignmentDirectional.topCenter,
           children: [
-            const Positioned.fill(child: CameraView()),
+         //   const Positioned.fill(child: CameraView()),
             if (showRobotModel) const RobotModelView(),
             if (showControlOverlay) const ControlOverlay(),
             if (showJoy) ...[
@@ -199,7 +199,7 @@ class HomeScreen extends StatelessWidget {
           () => CircleButton(
             tooltip: '',
             borderRadius: 12,
-            icon: IconData(0xea45, fontFamily: "GamePad"),
+            icon: AppIcons.gamePad, 
             // ignore: deprecated_member_use
             backgroundColor: AppColors.card.withOpacity(0.3),
             iconColor: controller.showJoy.value ? Colors.white : AppColors.grey,

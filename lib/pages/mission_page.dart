@@ -72,7 +72,7 @@ class MissionScreen extends StatelessWidget {
               _controlWidgt(controller),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           _buildListView(controller, theme),
         ],
       ),
@@ -193,7 +193,7 @@ class MissionScreen extends StatelessWidget {
             final bool isSelected = task['isSelected'] == true;
 
             return Container(
-              margin: const EdgeInsets.only(bottom: 12),
+              margin: const EdgeInsets.only(bottom: 8),
               padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
               decoration: BoxDecoration(
                 color: AppColors.scaffold,
