@@ -276,19 +276,19 @@ Widget buildResponsiveNavBar(BuildContext context) {
     onTap: (idx) {
       switch (idx) {
         case 0:
-          Get.offAllNamed('/main');
+         Get.toNamed('/main');
           break;
         case 1:
-          Get.offAllNamed('/teleoperated');
+          Get.toNamed('/teleoperated');
           break;
         case 2:
-          Get.offAllNamed('/mission');
+          Get.toNamed('/mission');
           break;
         case 3:
-          Get.offAllNamed('/setting');
+          Get.toNamed('/setting');
           break;
         case 4:
-          Get.offAllNamed('/service');
+          Get.toNamed('/service');
           break;
       }
     },

@@ -9,7 +9,7 @@ import '../widgets/controls/movement_joystick.dart';
 import '../widgets/controls/rotation_joystick.dart';
 import '../widgets/custom_widget.dart';
 import '../widgets/overlays/control_overlay.dart';
-import '../widgets/robot/robot_model_view.dart';
+//import '../widgets/robot/robot_model_view.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -65,7 +65,17 @@ class HomeScreen extends StatelessWidget {
         return Stack(
           children: [
            // const Positioned.fill(child: CameraView()),
-            if (showRobotModel) const RobotModelView(),
+            if (showRobotModel) 
+            //const RobotModelView(),
+            Positioned(
+                top: 10,
+                right: 10,
+                child: CameraView(
+                  width: screen.width * 0.3,
+                  height: screen.width * 0.3 * 9 / 16,
+                  borderRadius: 8,
+                ),
+              ),
             if (showControlOverlay) const ControlOverlay(),
             if (showJoy) ...[
               Positioned(
@@ -91,7 +101,9 @@ class HomeScreen extends StatelessWidget {
         return Stack(
           children: [
           //  const Positioned.fill(child: CameraView()),
-            if (showRobotModel) const RobotModelView(),
+            if (showRobotModel) const
+            // RobotModelView(),
+              AspectRatio(aspectRatio: 16 / 9, child: CameraView()),
             if (showControlOverlay) const ControlOverlay(),
             if (showJoy) ...[
               Positioned(
@@ -125,7 +137,17 @@ class HomeScreen extends StatelessWidget {
           alignment: AlignmentDirectional.topCenter,
           children: [
          //   const Positioned.fill(child: CameraView()),
-            if (showRobotModel) const RobotModelView(),
+            if (showRobotModel) 
+            //const RobotModelView(),
+              Positioned(
+                top: 10,
+                right: 10,
+                child: CameraView(
+                  width: screen.width * 0.35,
+                  height: screen.width * 0.35 * 9 / 16,
+                  borderRadius: 8,
+                ),
+              ),
             if (showControlOverlay) const ControlOverlay(),
             if (showJoy) ...[
               Positioned(

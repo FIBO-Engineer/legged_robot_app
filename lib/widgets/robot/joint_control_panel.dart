@@ -19,6 +19,7 @@ class JointControlPanel extends StatelessWidget {
     final screen = ScreenSize(context);
 
     return Column(
+      spacing: 6,
       children: [
         // Container(
         //   padding: const EdgeInsets.all(16),
@@ -32,7 +33,6 @@ class JointControlPanel extends StatelessWidget {
         //   ),
         // ),
         Row(
-          mainAxisAlignment: MainAxisAlignment.start,
           spacing: 8,
           children: [
             CustomButton(
@@ -96,7 +96,6 @@ class JointControlPanel extends StatelessWidget {
               ),
           ],
         ),
-        if (screen.isPortrait) SizedBox(height: 6),
         if (screen.isPortrait)
           ElevatedButton.icon(
             onPressed: () {
@@ -120,7 +119,6 @@ class JointControlPanel extends StatelessWidget {
               foregroundColor: Colors.white,
             ),
           ),
-        SizedBox(height: 6),
         Expanded(
           child: Obx(() {
             final joints = controller.getControllableJoints();
