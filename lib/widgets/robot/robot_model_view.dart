@@ -14,8 +14,18 @@ class RobotModelView extends StatelessWidget {
         return Stack(
           alignment: Alignment.topRight,
           children: [
-            const Align(alignment: Alignment.topRight, child: CircularProgressIndicator()),
-            Align(alignment: Alignment.topRight, child: SizedBox(width: 200, height: 250, child: urdfController.threeJs.build())),
+            const Align(
+              alignment: Alignment.topRight,
+              child: CircularProgressIndicator(),
+            ),
+            Align(
+              alignment: Alignment.topRight,
+              child: SizedBox(
+                width: 200,
+                height: 250,
+                child: urdfController.threeJs.build(),
+              ),
+            ),
           ],
         );
       }
@@ -23,16 +33,23 @@ class RobotModelView extends StatelessWidget {
       return LayoutBuilder(
         builder: (context, constraints) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            urdfController.updateSize(constraints.maxWidth * 0.15, constraints.maxHeight * 0.38);
+            urdfController.updateSize(
+              constraints.maxWidth * 0.15,
+              constraints.maxHeight * 0.38,
+            );
           });
 
           return Padding(
-            padding: const EdgeInsets.all(18.0),
+            padding: const EdgeInsets.fromLTRB(10, 26, 10, 10),
             child: Align(
               alignment: Alignment.topRight,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(16),
-                child: SizedBox(width: constraints.maxWidth * 0.15, height: constraints.maxHeight * 0.38, child: urdfController.threeJs.build()),
+                child: SizedBox(
+                  width: constraints.maxWidth * 0.15,
+                  height: constraints.maxHeight * 0.38,
+                  child: urdfController.threeJs.build(),
+                ),
               ),
             ),
           );

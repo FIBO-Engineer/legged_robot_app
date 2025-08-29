@@ -10,16 +10,23 @@ class RotationJoystick extends StatelessWidget {
   final MainController controller;
   final double sizeJoy;
   final double sizeBall;
+   final double right;
+  final double bottom;
   const RotationJoystick({
     super.key,
     required this.controller,
     this.sizeJoy = 200,
     this.sizeBall = 50,
+     this.right = 30,
+    this.bottom = 30,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Listener(
+    return  Positioned(
+      right: right,
+      bottom: bottom,
+      child:Listener(
       onPointerUp: (event) => _onPointerUp(),
       child: Joystick(
         includeInitialAnimation: false,
@@ -28,7 +35,7 @@ class RotationJoystick extends StatelessWidget {
           mode: JoystickMode.horizontal,
           decoration: JoystickBaseDecoration(
             // ignore: deprecated_member_use
-            color: AppColors.card.withOpacity(0.3),
+            color: AppColors.background.withOpacity(0.3),
             drawOuterCircle: false,
           ),
           arrowsDecoration: JoystickArrowsDecoration(
@@ -50,7 +57,7 @@ class RotationJoystick extends StatelessWidget {
         listener: _onJoystickMove,
         onStickDragEnd: _onStickDragEnd,
       ),
-    );
+    ));
   }
 
   void _onPointerUp() {

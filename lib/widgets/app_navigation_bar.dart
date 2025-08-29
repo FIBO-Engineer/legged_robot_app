@@ -43,7 +43,7 @@ class _SidebarNavigation extends StatelessWidget {
     return Container(
       width: 56,
       color: AppColors.scaffold,
-      padding: const EdgeInsets.symmetric(vertical: 16),
+      padding: const EdgeInsets.symmetric(vertical: 26),
       child: Column(
         children: [
           Icon(Icons.psychology_rounded, color: Colors.white, size: 32),
@@ -167,13 +167,13 @@ class _FloatingNavigation extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             decoration: BoxDecoration(
               // ignore: deprecated_member_use
-              color: AppColors.scaffold.withOpacity(0.9),
+              color: AppColors.scaffold.withOpacity(0.7),
               borderRadius: BorderRadius.circular(28),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                if (isExpanded) ...[
+                if (!isExpanded) ...[
                   _navButton(0, Icons.dashboard_outlined),
                   _spacer(),
                   _navButton(
@@ -225,7 +225,8 @@ class _FloatingNavigation extends StatelessWidget {
       case 0:
         return Icons.dashboard;
       case 1:
-        return IconData(0xea45, fontFamily: "GamePad");
+        return Icons.manage_accounts_outlined;
+      //IconData(0xea45, fontFamily: "GamePad");
       case 2:
         return Icons.flag;
       case 3:
@@ -276,7 +277,7 @@ Widget buildResponsiveNavBar(BuildContext context) {
     onTap: (idx) {
       switch (idx) {
         case 0:
-         Get.toNamed('/main');
+          Get.toNamed('/main');
           break;
         case 1:
           Get.toNamed('/teleoperated');
@@ -303,7 +304,9 @@ Widget buildResponsiveNavBar(BuildContext context) {
     return Positioned(
       left: 0,
       right: 0,
-      bottom: 10,
+      bottom: 16,
+      // top: navIndex == 0 ? 26 : null,
+      // bottom: navIndex == 0 ? null : 10,
       child: Center(child: navBar),
     );
   }

@@ -68,8 +68,9 @@ class ServiceScreen extends StatelessWidget {
     final MainController main = Get.find();
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+         padding: const EdgeInsets.fromLTRB(10, 26, 10, 10),
       child: Column(
+        spacing: 8,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
@@ -99,7 +100,7 @@ class ServiceScreen extends StatelessWidget {
           controller.isPublish.value ? 'Publish' : 'Call Service';
       final topics = controller.topics;
       return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 6),
         decoration: BoxDecoration(
           color: AppColors.card,
           borderRadius: BorderRadius.circular(28),
@@ -122,7 +123,7 @@ class ServiceScreen extends StatelessWidget {
                   label: Text(
                     topic,
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 13,
                       color: isSelected ? Colors.white : AppColors.grey,
                       fontWeight: FontWeight.w500,
                     ),
@@ -133,8 +134,8 @@ class ServiceScreen extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(28),
                     ),
-                    minimumSize: const Size(0, 44),
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    minimumSize: const Size(0, 40),
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
                   ),
                 );
               }).toList(),
@@ -157,7 +158,7 @@ class ServiceScreen extends StatelessWidget {
       Dialog(
         backgroundColor: AppColors.background,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         child: ConstrainedBox(
           constraints: BoxConstraints(
             maxWidth: maxW,
@@ -165,10 +166,10 @@ class ServiceScreen extends StatelessWidget {
           ),
           child: Padding(
             padding: EdgeInsets.only(
-              left: 16,
-              right: 16,
-              top: 16,
-              bottom: 16 + MediaQuery.of(context).viewInsets.bottom,
+              left: 10,
+              right: 10,
+              top: 10,
+              bottom: 10 + MediaQuery.of(context).viewInsets.bottom,
             ),
             child: SingleChildScrollView(
               child: _addFormWidget(controller, theme),
@@ -183,7 +184,7 @@ class ServiceScreen extends StatelessWidget {
   Widget _addFormWidget(ManagementController controller, ThemeData theme) {
     final isEdit = controller.editCard.value;
     return Column(
-      spacing: 12,
+      spacing: 10,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Text(
@@ -242,7 +243,7 @@ class ServiceScreen extends StatelessWidget {
                           physics: const ClampingScrollPhysics(),
                           itemCount: controller.args.value,
                           separatorBuilder:
-                              (_, __) => const SizedBox(height: 10),
+                              (_, __) => const SizedBox(height: 8),
                           itemBuilder:
                               (_, i) => TextField(
                                 maxLines: null,
@@ -263,7 +264,7 @@ class ServiceScreen extends StatelessWidget {
                           physics: const ClampingScrollPhysics(),
                           itemCount: controller.data.value,
                           separatorBuilder:
-                              (_, __) => const SizedBox(height: 10),
+                              (_, __) => const SizedBox(height: 8),
                           itemBuilder:
                               (_, i) => TextField(
                                 maxLines: null,
@@ -451,14 +452,14 @@ class ServiceScreen extends StatelessWidget {
   ) {
     return Obx(
       () => GridView.builder(
-        padding: const EdgeInsets.symmetric(vertical: 8),
+            padding: EdgeInsets.zero,  
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: screen.isPortrait ? 2 : 4,
           mainAxisExtent: 150,
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
+          crossAxisSpacing: 8,
+          mainAxisSpacing: 8,
         ),
         itemCount: controller.cards.length + 1,
         itemBuilder: (_, index) {

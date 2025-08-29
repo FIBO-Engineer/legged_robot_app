@@ -191,16 +191,8 @@ class JointSlider extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.background,
         borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            // ignore: deprecated_member_use
-            color: jointColor.withOpacity(0.15),
-            blurRadius: 4,
-            offset: const Offset(0, 1),
-          ),
-        ],
         // ignore: deprecated_member_use
-        border: Border.all(color: jointColor.withOpacity(0.4), width: 1.5),
+        border: Border.all(color: jointColor.withOpacity(0.7), width: 1.2),
       ),
       child: MouseRegion(
         onEnter: (_) => controller.highlightJoint(joint.name),

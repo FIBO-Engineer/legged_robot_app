@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import '../../controllers/main_conroller.dart';
 import '../../controllers/urdf_controller.dart';
 import '../../units/app_colors.dart';
-import '../../units/app_constants.dart';
 import '../custom_widget.dart';
 import 'joint_slider.dart';
 
@@ -16,22 +15,9 @@ class JointControlPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     final UrdfController controller = Get.find<UrdfController>();
     final MainController mainController = Get.find();
-    final screen = ScreenSize(context);
-
     return Column(
       spacing: 6,
       children: [
-        // Container(
-        //   padding: const EdgeInsets.all(16),
-        //   child: const Text(
-        //     'Joint Controls',
-        //     style: TextStyle(
-        //       fontSize: 14,
-        //       fontWeight: FontWeight.bold,
-        //       color: AppColors.grey,
-        //     ),
-        //   ),
-        // ),
         Row(
           spacing: 8,
           children: [
@@ -74,7 +60,6 @@ class JointControlPanel extends StatelessWidget {
               cursor: SystemMouseCursors.click,
               child: CircleButton(
                 borderRadius: 12,
-                size: 40,
                 iconColor: AppColors.grey,
                 icon: Icons.clear,
                 onPressed: () {
@@ -85,7 +70,6 @@ class JointControlPanel extends StatelessWidget {
               ),
             ),
             Spacer(),
-            if (!screen.isPortrait)
               CustomButton(
                 text: 'Save',
                 foregroundColor: AppColors.green,
@@ -96,29 +80,6 @@ class JointControlPanel extends StatelessWidget {
               ),
           ],
         ),
-        if (screen.isPortrait)
-          ElevatedButton.icon(
-            onPressed: () {
-              _showSaveDialog(context, mainController);
-            },
-            label: const Text(
-              'Save',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.white,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            icon: const Icon(Icons.save),
-            style: ElevatedButton.styleFrom(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              minimumSize: const Size(double.infinity, 46),
-              backgroundColor: Colors.green,
-              foregroundColor: Colors.white,
-            ),
-          ),
         Expanded(
           child: Obx(() {
             final joints = controller.getControllableJoints();
@@ -128,6 +89,8 @@ class JointControlPanel extends StatelessWidget {
             }
 
             return ListView.builder(
+              shrinkWrap: true,
+              padding: EdgeInsets.zero,
               itemCount: joints.length,
               itemBuilder: (context, index) {
                 return JointSlider(joint: joints[index]);

@@ -61,8 +61,9 @@ class SettingScreen extends StatelessWidget {
     final MainController controller = Get.find();
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.fromLTRB(10, 26, 10, 10),
       child: Column(
+        spacing: 10,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
@@ -72,17 +73,14 @@ class SettingScreen extends StatelessWidget {
               _profileWidget(controller, theme),
             ],
           ),
-          const SizedBox(height: 10),
           _Section(
             title: 'Basic Setting',
             child: _BasicSetting(controller: controller, screen: screen),
           ),
-          const SizedBox(height: 16),
           _Section(
             title: 'Motion Control',
             child: _MotionControl(controller: controller, screen: screen),
           ),
-          const SizedBox(height: 10),
           Align(
             alignment: Alignment.centerRight,
             child: Wrap(
@@ -154,7 +152,7 @@ class SettingScreen extends StatelessWidget {
       }
 
       return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 6),
         decoration: BoxDecoration(
           color: AppColors.scaffold,
           borderRadius: BorderRadius.circular(28),
@@ -176,7 +174,7 @@ class SettingScreen extends StatelessWidget {
               label: Text(
                 p.robotType,
                 style: TextStyle(
-                  fontSize: 12,
+                  fontSize: 13,
                   color: isSelected ? Colors.white : AppColors.grey,
                   fontWeight: FontWeight.w500,
                 ),
@@ -185,10 +183,10 @@ class SettingScreen extends StatelessWidget {
                 backgroundColor:
                     isSelected ? AppColors.primary : Colors.transparent,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(28),
                 ),
-                minimumSize: const Size(0, 46),
-                padding: const EdgeInsets.symmetric(horizontal: 12),
+                minimumSize: const Size(0,40),
+                padding: const EdgeInsets.symmetric(horizontal: 8),
               ),
             );
           }),
@@ -208,10 +206,10 @@ class _Section extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Column(
+      spacing: 10,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(title, style: theme.textTheme.titleMedium),
-        const SizedBox(height: 8),
         child,
       ],
     );
@@ -293,35 +291,16 @@ class _BasicSetting extends StatelessWidget {
             ),
           ),
           Obx(
-            () => TextButton.icon(
-              icon: Icon(
-                !controller.disconnect.value
-                    ? Icons.link_off_rounded
-                    : Icons.link_rounded,
-                color:
-                    !controller.disconnect.value
-                        ? AppColors.red
-                        : AppColors.primary,
-              ),
-              label: Text(
-                controller.disconnect.value ? 'Connect' : 'Disconnect',
-                style: TextStyle(
-                  fontSize: 14,
-                  color:
-                      !controller.disconnect.value
-                          ? AppColors.red
-                          : AppColors.primary,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              style: TextButton.styleFrom(
-                backgroundColor: AppColors.card,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                minimumSize: const Size(0, 56),
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-              ),
+            () => CustomButton(
+              text: controller.disconnect.value ? 'Connect' : 'Disconnect',
+              icon:
+                  !controller.disconnect.value
+                      ? Icons.link_off_rounded
+                      : Icons.link_rounded,
+              foregroundColor:
+                  !controller.disconnect.value
+                      ? AppColors.red
+                      : AppColors.primary,
               onPressed: () {
                 if (controller.disconnect.value) {
                   controller.connectRobot();
@@ -359,7 +338,7 @@ class _MotionControl extends StatelessWidget {
                 padding: const EdgeInsets.only(left: 10),
                 child: Text(
                   label,
-                  style: Theme.of(context).textTheme.titleSmall,
+                  style: Theme.of(context).textTheme.titleSmall,   
                 ),
               ),
               Row(
@@ -391,7 +370,7 @@ class _MotionControl extends StatelessWidget {
                   ),
                   Text(
                     v.value.toStringAsFixed(1),
-                    style: Theme.of(context).textTheme.titleMedium,
+                    style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(width: 4),
                 ],

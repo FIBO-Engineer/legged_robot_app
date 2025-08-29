@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
 
@@ -23,19 +24,19 @@ TextTheme textTheme() {
     ),
     titleLarge: TextStyle(
       fontSize: 16,
-      fontWeight: FontWeight.w500,
+      fontWeight: FontWeight.w600,
       color: Colors.white,
       overflow: TextOverflow.ellipsis,
     ),
     titleMedium: TextStyle(
       fontSize: 14,
-      fontWeight: FontWeight.w400,
-      color: Colors.white,
+      fontWeight: FontWeight.w500,
+      color: AppColors.grey,
       overflow: TextOverflow.ellipsis,
     ),
     titleSmall: TextStyle(
       fontSize: 14,
-      fontWeight: FontWeight.w400,
+      fontWeight: FontWeight.w500,
       color: AppColors.grey,
       overflow: TextOverflow.ellipsis,
     ),
@@ -60,10 +61,31 @@ TextTheme textTheme() {
   );
 }
 
-InputDecorationTheme inputDecorationTheme() {
+InputDecorationTheme inputDecorationTheme(BuildContext context) {
   const borderRadius = BorderRadius.all(Radius.circular(12));
 
+  final isMobile = defaultTargetPlatform == TargetPlatform.android ||
+      defaultTargetPlatform == TargetPlatform.iOS;
+  final media = MediaQuery.of(context);
+  final isPortrait = media.orientation == Orientation.portrait;
+  final double font = isMobile ? 14 : 13;
+  final double vPad = isMobile
+      ? (isPortrait ? 10 : 12) 
+      : 8;
+  final double minH = isMobile ? 44 : 40;
+
   return InputDecorationTheme(
+    isDense: true,
+    contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: vPad),
+    constraints: BoxConstraints(minHeight: minH),
+
+    prefixIconConstraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+    suffixIconConstraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+
+    filled: true,
+    alignLabelWithHint: true,
+    fillColor: AppColors.scaffold,
+
     border: const OutlineInputBorder(
       borderRadius: borderRadius,
       borderSide: BorderSide.none,
@@ -84,32 +106,14 @@ InputDecorationTheme inputDecorationTheme() {
       borderRadius: borderRadius,
       borderSide: BorderSide(color: AppColors.red, width: 1),
     ),
-    filled: true,
-    alignLabelWithHint: true,
-    fillColor: AppColors.scaffold,
+
     prefixIconColor: AppColors.grey,
     suffixIconColor: AppColors.grey,
-    helperStyle: const TextStyle(color: AppColors.grey, fontSize: 14),
-    errorStyle: const TextStyle(color: AppColors.red, fontSize: 14),
-    labelStyle: const TextStyle(
-      color: AppColors.grey,
-      fontSize: 14,
-      fontWeight: FontWeight.normal,
-    ),
-    hintStyle: const TextStyle(
-      color: AppColors.grey,
-      fontSize: 14,
-      fontWeight: FontWeight.normal,
-    ),
-    prefixStyle: const TextStyle(
-      color: Colors.white,
-      fontSize: 14,
-      fontWeight: FontWeight.normal,
-    ),
-    floatingLabelStyle: const TextStyle(
-      color: AppColors.grey,
-      fontSize: 14,
-      fontWeight: FontWeight.normal,
-    ),
+
+    labelStyle: TextStyle(color: AppColors.grey, fontSize: font),
+    hintStyle:  TextStyle(color: AppColors.grey, fontSize: font),
+    helperStyle: const TextStyle(color: AppColors.grey, fontSize: 13),
+    errorStyle:  const TextStyle(color: AppColors.red,  fontSize: 13),
+    floatingLabelStyle: TextStyle(color: AppColors.grey, fontSize: font),
   );
 }

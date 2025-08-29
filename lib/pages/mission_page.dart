@@ -61,8 +61,9 @@ class MissionScreen extends StatelessWidget {
     final MissionController controller = Get.put(MissionController());
 
     return Padding(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.fromLTRB(10, 26, 10, 10),
       child: Column(
+        spacing: 8,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
@@ -72,7 +73,6 @@ class MissionScreen extends StatelessWidget {
               _controlWidgt(controller),
             ],
           ),
-          const SizedBox(height: 12),
           _buildListView(controller, theme),
         ],
       ),
@@ -121,6 +121,7 @@ class MissionScreen extends StatelessWidget {
 
   Widget _controlWidgt(MissionController controller) {
     return Row(
+      spacing: 8,
       children: [
         Obx(
           () => CustomButton(
@@ -134,7 +135,6 @@ class MissionScreen extends StatelessWidget {
             onPressed: controller.togglePlay,
           ),
         ),
-        const SizedBox(width: 16),
         CustomButton(
           text: "Stop",
           icon: Icons.stop_circle_rounded,
@@ -148,13 +148,15 @@ class MissionScreen extends StatelessWidget {
   Widget _newMission(ThemeData theme) {
     return InkWell(
       borderRadius: BorderRadius.circular(12),
-      onTap: () { showCustomDialog(
-                        title: 'New',
-                        message: 'Are you sure you want to add new mission?',
-                        color: AppColors.primary,
-                        icon: Icons.add_rounded,
-                        onConfirm: () {},
-                      );},
+      onTap: () {
+        showCustomDialog(
+          title: 'New',
+          message: 'Are you sure you want to add new mission?',
+          color: AppColors.primary,
+          icon: Icons.add_rounded,
+          onConfirm: () {},
+        );
+      },
       child: CustomPaint(
         foregroundPainter: DashedPainter(radius: 12, color: AppColors.grey),
         child: Container(
@@ -182,6 +184,8 @@ class MissionScreen extends StatelessWidget {
       child: Obx(() {
         final tasks = controller.tasks;
         return ListView.builder(
+          shrinkWrap: true,
+          padding: EdgeInsets.zero,
           itemCount: tasks.length + 1,
           itemBuilder: (context, index) {
             if (index == tasks.length) {
@@ -194,24 +198,23 @@ class MissionScreen extends StatelessWidget {
 
             return Container(
               margin: const EdgeInsets.only(bottom: 8),
-              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
               decoration: BoxDecoration(
                 color: AppColors.scaffold,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                   color: isSelected ? AppColors.primary : AppColors.scaffold,
-                  width: isSelected ? 1.5 : 1,
+                  width: isSelected ? 1.2 : 1,
                 ),
               ),
               child: Row(
+                spacing: 8,
                 children: [
                   Checkbox(
                     value: isSelected,
                     activeColor: AppColors.primary,
-                    side: const BorderSide(color: AppColors.grey, width: 1.5),
+                    side: const BorderSide(color: AppColors.grey, width: 1.2),
                     onChanged: (_) => controller.selectTask(id),
                   ),
-                  const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       id,
@@ -239,7 +242,6 @@ class MissionScreen extends StatelessWidget {
                       );
                     },
                   ),
-                  SizedBox(width: 8),
                   IconButton(
                     icon: const Icon(
                       Icons.delete_rounded,
@@ -282,15 +284,14 @@ class SectionStatus extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      spacing: 6,
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(icon, size: 20, color: AppColors.grey),
-        SizedBox(width: 4),
         Text(
           label,
           style: TextStyle(color: AppColors.grey, fontWeight: FontWeight.w500),
         ),
-        SizedBox(width: 6),
         Text(
           value,
           style: TextStyle(

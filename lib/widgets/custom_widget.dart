@@ -27,25 +27,25 @@ class CircleButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return  Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          color: backgroundColor,
+    return IconButton(
+      onPressed: onPressed,
+      tooltip: tooltip,
+      icon: Icon(icon, color: iconColor, size: iconSize),
+      style: IconButton.styleFrom(
+        fixedSize: Size(size, size),
+        minimumSize: Size(size, size),
+        padding: EdgeInsets.zero,
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        visualDensity: VisualDensity.compact,
+        backgroundColor: backgroundColor,
+        shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(borderRadius),
-          border: Border.all(color: borderColor, width: 1.2),
+          side: BorderSide(color: borderColor, width: 1.2),
         ),
-        child: IconButton(
-          hoverColor: backgroundColor,
-          icon: Icon(icon, color: iconColor, size: iconSize),
-          onPressed: onPressed,
-          tooltip: tooltip,
-        ),
-      
+      ),
     );
   }
 }
-
 class CustomButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback onPressed;
@@ -63,13 +63,14 @@ class CustomButton extends StatelessWidget {
     this.backgroundColor = AppColors.card,
     this.foregroundColor = AppColors.grey,
     this.borderRadius = 12,
-    this.height = 46.0,
+    this.height = 46.0, 
   });
 
   @override
   Widget build(BuildContext context) {
     return TextButton.icon(
-      icon: Icon(icon, color: foregroundColor),
+      onPressed: onPressed,
+      icon: Icon(icon, color: foregroundColor, size: 18),
       label: Text(
         text,
         style: TextStyle(
@@ -79,16 +80,18 @@ class CustomButton extends StatelessWidget {
         ),
       ),
       style: TextButton.styleFrom(
-        elevation: 2,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         backgroundColor: backgroundColor,
         foregroundColor: foregroundColor,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        fixedSize: Size.fromHeight(height),
+        minimumSize: Size(0, height),
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        visualDensity: VisualDensity.compact,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(borderRadius),
         ),
-        minimumSize: Size(0, height),
+        elevation: 2,
       ),
-      onPressed: onPressed,
     );
   }
 }

@@ -10,8 +10,8 @@ class ControlOverlay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      top: 10,
-      left: 10,
+      top: 26,
+      left: 66,
       child: GlassmorphismContainer(
         width: 330,
         height: 200,

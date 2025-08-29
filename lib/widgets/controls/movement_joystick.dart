@@ -10,46 +10,54 @@ class MovementJoystick extends StatelessWidget {
   final MainController controller;
   final double sizeJoy;
   final double sizeBall;
+  final double left;
+  final double bottom;
 
   const MovementJoystick({
     super.key,
     required this.controller,
     this.sizeJoy = 200,
     this.sizeBall = 50,
+    this.left = 30,
+    this.bottom = 30,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Listener(
-      onPointerUp: (event) => _onPointerUp(),
-      child: Joystick(
-        includeInitialAnimation: false,
-        base: JoystickBase(
-          size: sizeJoy,
-          mode: JoystickMode.all,
-          decoration: JoystickBaseDecoration(
-            // ignore: deprecated_member_use
-            color:  AppColors.card.withOpacity(0.3),
-            drawOuterCircle: false,
+    return Positioned(
+      left: left,
+      bottom: bottom,
+      child: Listener(
+        onPointerUp: (event) => _onPointerUp(),
+        child: Joystick(
+          includeInitialAnimation: false,
+          base: JoystickBase(
+            size: sizeJoy,
+            mode: JoystickMode.all,
+            decoration: JoystickBaseDecoration(
+              // ignore: deprecated_member_use
+              color: AppColors.background.withOpacity(0.3),
+              drawOuterCircle: false,
+            ),
+            arrowsDecoration: JoystickArrowsDecoration(
+              // ignore: deprecated_member_use
+              color: AppColors.red.withOpacity(0.6),
+              enableAnimation: false,
+            ),
           ),
-          arrowsDecoration: JoystickArrowsDecoration(
-            // ignore: deprecated_member_use
-            color: AppColors.red.withOpacity(0.6),
-            enableAnimation: false,
+          stick: JoystickStick(
+            size: sizeBall,
+            decoration: JoystickStickDecoration(
+              // ignore: deprecated_member_use
+              color: AppColors.red.withOpacity(0.7),
+            ),
           ),
-        ),
-        stick: JoystickStick(
-          size: sizeBall,
-          decoration: JoystickStickDecoration(
-            // ignore: deprecated_member_use
-            color: AppColors.red.withOpacity(0.7),
+          period: Duration(
+            milliseconds: controller.samplingRate.value.toInt() * 1000,
           ),
+          listener: _onJoystickMove,
+          onStickDragEnd: _onStickDragEnd,
         ),
-        period: Duration(
-          milliseconds: controller.samplingRate.value.toInt() * 1000,
-        ),
-        listener: _onJoystickMove,
-        onStickDragEnd: _onStickDragEnd,
       ),
     );
   }

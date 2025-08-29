@@ -1,24 +1,36 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:legged_robot_app/units/app_themes.dart';
 import 'route/routes.dart';
 import 'bindings/root_binding.dart';
 import 'package:toastification/toastification.dart';
 import 'units/app_colors.dart';
+import 'units/app_constants.dart';
 // ignore: deprecated_member_use, avoid_web_libraries_in_flutter
 // import 'dart:html' as html;
 
-void main() {
+import 'package:flutter/foundation.dart' show kIsWeb;
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   Get.config(
-    // enableLog: false,
     defaultTransition: Transition.noTransition,
     defaultOpaqueRoute: true,
     defaultPopGesture: false,
   );
 
-  // html.document.onContextMenu.listen((event) => event.preventDefault());
-  runApp(MyApp());
+  if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
+    await SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
+  }
+
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -45,7 +57,7 @@ class MyApp extends StatelessWidget {
             secondary: AppColors.primary,
           ),
           textTheme: textTheme(),
-          inputDecorationTheme: inputDecorationTheme(),
+          inputDecorationTheme: inputDecorationTheme(context),
           progressIndicatorTheme: ProgressIndicatorThemeData(
             color: AppColors.primary,
           ),
