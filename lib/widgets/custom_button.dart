@@ -18,7 +18,7 @@ class CircleButton extends StatelessWidget {
     this.iconColor = Colors.white,
     this.backgroundColor = AppColors.card,
     this.borderColor = Colors.transparent,
-    this.size = 46,
+    this.size = 44,
     this.iconSize = 20,
     this.borderRadius = 28,
     this.tooltip = "",
@@ -62,8 +62,8 @@ class CustomButton extends StatelessWidget {
     this.text = '',
     this.backgroundColor = AppColors.card,
     this.foregroundColor = AppColors.grey,
-    this.borderRadius = 12,
-    this.height = 46.0, 
+    this.borderRadius = 28,
+    this.height = 44, 
   });
 
   @override
@@ -82,7 +82,7 @@ class CustomButton extends StatelessWidget {
       style: TextButton.styleFrom(
         backgroundColor: backgroundColor,
         foregroundColor: foregroundColor,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 28, vertical:8),
         fixedSize: Size.fromHeight(height),
         minimumSize: Size(0, height),
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,

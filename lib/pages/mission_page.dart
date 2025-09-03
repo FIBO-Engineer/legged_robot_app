@@ -5,7 +5,7 @@ import '../units/app_colors.dart';
 import '../units/app_constants.dart';
 import '../widgets/app_navigation_bar.dart';
 import '../widgets/custom_dialog.dart';
-import '../widgets/custom_widget.dart';
+import '../widgets/custom_button.dart';
 import '../widgets/dashed_painter.dart';
 
 class MissionPage extends StatelessWidget {
@@ -160,7 +160,7 @@ class MissionScreen extends StatelessWidget {
       child: CustomPaint(
         foregroundPainter: DashedPainter(radius: 12, color: AppColors.grey),
         child: Container(
-          height: 46,
+          height: 40,
           decoration: BoxDecoration(
             color: AppColors.background,
             borderRadius: BorderRadius.circular(12),
@@ -200,7 +200,7 @@ class MissionScreen extends StatelessWidget {
               margin: const EdgeInsets.only(bottom: 8),
               decoration: BoxDecoration(
                 color: AppColors.scaffold,
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: isSelected ? AppColors.primary : AppColors.scaffold,
                   width: isSelected ? 1.2 : 1,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:legged_robot_app/widgets/custom_widget.dart';
+import 'package:legged_robot_app/widgets/custom_button.dart';
 import '../controllers/main_conroller.dart';
 import '../units/app_colors.dart';
 import '../units/app_constants.dart';
@@ -185,7 +185,7 @@ class SettingScreen extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(28),
                 ),
-                minimumSize: const Size(0,40),
+                minimumSize: const Size(0, 40),
                 padding: const EdgeInsets.symmetric(horizontal: 8),
               ),
             );
@@ -208,10 +208,7 @@ class _Section extends StatelessWidget {
     return Column(
       spacing: 10,
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(title, style: theme.textTheme.titleMedium),
-        child,
-      ],
+      children: [Text(title, style: theme.textTheme.titleMedium), child],
     );
   }
 }
@@ -239,52 +236,18 @@ class _BasicSetting extends StatelessWidget {
     }
 
     return Obx(() {
-      if (screen.isPortrait) {
-        return Column(
-          spacing: 8,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            tf(
-              controller: controller.ipWebSocket.value,
-              label: 'Websocket Address',
-            ),
-            tf(controller: controller.ipCamera.value, label: 'Camera Address'),
-
-            Obx(
-              () => CustomButton(
-                text: controller.disconnect.value ? 'Connect' : 'Disconnect',
-                icon:
-                    !controller.disconnect.value
-                        ? Icons.link_off_rounded
-                        : Icons.link_rounded,
-                foregroundColor:
-                    !controller.disconnect.value
-                        ? AppColors.red
-                        : AppColors.primary,
-                onPressed: () {
-                  if (controller.disconnect.value) {
-                    controller.connectRobot();
-                  } else {
-                    controller.disconnectRobot();
-                  }
-                },
-              ),
-            ),
-          ],
-        );
-      }
       return Row(
         spacing: 8,
         children: [
           Expanded(
-            flex: 3,
+            flex: 1,
             child: tf(
               controller: controller.ipWebSocket.value,
               label: 'Websocket Address',
             ),
           ),
           Expanded(
-            flex: 4,
+            flex: 1,
             child: tf(
               controller: controller.ipCamera.value,
               label: 'Camera Address',
@@ -338,7 +301,7 @@ class _MotionControl extends StatelessWidget {
                 padding: const EdgeInsets.only(left: 10),
                 child: Text(
                   label,
-                  style: Theme.of(context).textTheme.titleSmall,   
+                  style: Theme.of(context).textTheme.titleSmall,
                 ),
               ),
               Row(
@@ -378,18 +341,6 @@ class _MotionControl extends StatelessWidget {
             ],
           ),
         ),
-      );
-    }
-
-    if (screen.isPortrait) {
-      return Column(
-        spacing: 8,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          tile('Linear Speed', controller.linearSpeed),
-          tile('Angular Speed', controller.angularSpeed),
-          tile('Sampling Rate', controller.samplingRate),
-        ],
       );
     }
 

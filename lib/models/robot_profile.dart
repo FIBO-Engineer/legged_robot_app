@@ -61,7 +61,7 @@ List<Profile> defaultProfiles() => [
     samplingRate: 0.1,
   ),
   Profile(
-    robotType: 'B1W',
+    robotType: 'B2W',
     ip: '',
     camera: '',
     linearSpeed: 0.4,

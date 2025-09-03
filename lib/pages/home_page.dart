@@ -6,7 +6,7 @@ import '../units/app_constants.dart';
 import '../widgets/app_navigation_bar.dart';
 import '../widgets/controls/movement_joystick.dart';
 import '../widgets/controls/rotation_joystick.dart';
-import '../widgets/custom_widget.dart';
+import '../widgets/custom_button.dart';
 import '../widgets/overlays/control_overlay.dart';
 import '../widgets/robot/robot_model_view.dart';
 

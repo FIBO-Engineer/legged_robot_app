@@ -10,7 +10,7 @@ import '../units/app_colors.dart';
 import '../units/app_constants.dart';
 import '../widgets/app_navigation_bar.dart';
 import '../widgets/custom_dialog.dart';
-import '../widgets/custom_widget.dart';
+import '../widgets/custom_button.dart';
 import '../widgets/dashed_painter.dart';
 
 class ServicePage extends StatelessWidget {

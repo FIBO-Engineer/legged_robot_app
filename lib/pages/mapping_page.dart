@@ -4,7 +4,7 @@ import '../controllers/urdf_controller.dart';
 import '../units/app_colors.dart';
 import '../units/app_constants.dart';
 import '../widgets/app_navigation_bar.dart';
-import '../widgets/custom_widget.dart';
+import '../widgets/custom_button.dart';
 import '../widgets/robot/joint_control_panel.dart';
 
 class MappingPage extends StatelessWidget {
@@ -60,7 +60,7 @@ class MappingScreen extends StatelessWidget {
           Expanded(
             flex: 2,
             child: Container(
-              decoration: const BoxDecoration(color: AppColors.scaffold),
+              decoration: const BoxDecoration(color: AppColors.background),
               child: _build3DViewer(controller),
             ),
           ),
@@ -68,7 +68,7 @@ class MappingScreen extends StatelessWidget {
           Expanded(
             flex: 3,
             child: Container(
-              decoration: const BoxDecoration(color: AppColors.scaffold),
+              decoration: const BoxDecoration(color: AppColors.background),
               child: _buildControlPanel(context, controller),
             ),
           ),

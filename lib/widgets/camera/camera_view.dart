@@ -3,7 +3,7 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:get/get.dart';
 import 'package:legged_robot_app/units/app_colors.dart';
 import '../../controllers/app_controller.dart';
-import '../custom_widget.dart';
+import '../custom_button.dart';
 
 class CameraView extends StatelessWidget {
   final double? width;

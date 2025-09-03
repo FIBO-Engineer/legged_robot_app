@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import '../../controllers/main_conroller.dart';
 import '../../controllers/urdf_controller.dart';
 import '../../units/app_colors.dart';
-import '../custom_widget.dart';
+import '../custom_button.dart';
 import 'joint_slider.dart';
 
 class JointControlPanel extends StatelessWidget {

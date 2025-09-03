@@ -7,7 +7,7 @@ import '../widgets/app_navigation_bar.dart';
 import '../widgets/camera/camera_view.dart';
 import '../widgets/controls/movement_joystick.dart';
 import '../widgets/controls/rotation_joystick.dart';
-import '../widgets/custom_widget.dart';
+import '../widgets/custom_button.dart';
 
 class TeleoperatedPage extends StatelessWidget {
   const TeleoperatedPage({super.key});

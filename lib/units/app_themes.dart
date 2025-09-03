@@ -62,17 +62,16 @@ TextTheme textTheme() {
 }
 
 InputDecorationTheme inputDecorationTheme(BuildContext context) {
-  const borderRadius = BorderRadius.all(Radius.circular(12));
-
-  final isMobile = defaultTargetPlatform == TargetPlatform.android ||
+  const borderRadius = BorderRadius.all(Radius.circular(28));
+  // final double font = 14;
+  // final double vPad = 10;
+  // final double minH = 44;
+  final isMobile =
+      defaultTargetPlatform == TargetPlatform.android ||
       defaultTargetPlatform == TargetPlatform.iOS;
-  final media = MediaQuery.of(context);
-  final isPortrait = media.orientation == Orientation.portrait;
-  final double font = isMobile ? 14 : 13;
-  final double vPad = isMobile
-      ? (isPortrait ? 10 : 12) 
-      : 8;
-  final double minH = isMobile ? 44 : 40;
+  final double font =  14;
+  final double vPad = isMobile ? 12 : 14;
+  final double minH = isMobile ? 44 : 46;
 
   return InputDecorationTheme(
     isDense: true,
@@ -111,9 +110,9 @@ InputDecorationTheme inputDecorationTheme(BuildContext context) {
     suffixIconColor: AppColors.grey,
 
     labelStyle: TextStyle(color: AppColors.grey, fontSize: font),
-    hintStyle:  TextStyle(color: AppColors.grey, fontSize: font),
+    hintStyle: TextStyle(color: AppColors.grey, fontSize: font),
     helperStyle: const TextStyle(color: AppColors.grey, fontSize: 13),
-    errorStyle:  const TextStyle(color: AppColors.red,  fontSize: 13),
+    errorStyle: const TextStyle(color: AppColors.red, fontSize: 13),
     floatingLabelStyle: TextStyle(color: AppColors.grey, fontSize: font),
   );
 }
